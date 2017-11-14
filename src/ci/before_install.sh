@@ -38,6 +38,6 @@ rm apache-maven-${MVN_VERSION}-bin.zip
 export M2_HOME=$PWD/../apache-maven-${MVN_VERSION}
 export PATH=$M2_HOME/bin:${JAVA_HOME}/bin:$PATH
 
-info "Build configuration:"
+echo "Build configuration:"
 echo "Version:             $ARTIFACT_VERSION"
 echo "Is release:          ${IS_RELEASE:-false}"
