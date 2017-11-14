@@ -64,6 +64,10 @@ abstract class ApplicationTestRunner extends HttpMock {
 
     @BeforeMethod
     void checkToRun(Method method) {
+        if (scenario.enabled == false) {
+            throw new SkipException("Skipping the disabled scenario")
+        }
+
         for (String disabledTest : scenario.disabledTests) {
             if (method.getName().equals(disabledTest)) {
                 throw new SkipException("Skipping the disabled test - " + disabledTest)
@@ -73,6 +77,10 @@ abstract class ApplicationTestRunner extends HttpMock {
 
     @BeforeClass
     void start() {
+        if (scenario.enabled == false) {
+            return;
+        }    
+
         startMockServer()
         app.start()
 
@@ -86,6 +94,9 @@ abstract class ApplicationTestRunner extends HttpMock {
     
     @AfterClass
     void stop() {
+        if (scenario.enabled == false) {
+            return;
+        }   
         int exitStatus = app.stop()
         assertThat("exit status was not 0 or 143 (SIGTERM)", exitStatus==0 || exitStatus==143)
     }
@@ -114,7 +125,7 @@ abstract class ApplicationTestRunner extends HttpMock {
         // figure out which ports we need
         applicationPort = getPort("applicationPort", scenario)
         mockPort = getPort("mockPort", scenario)
-
+        
         // interpolate the scenario args with the ports
         def templateEngine = new StreamingTemplateEngine()
         def binding = [applicationPort: applicationPort, mockPort: mockPort]

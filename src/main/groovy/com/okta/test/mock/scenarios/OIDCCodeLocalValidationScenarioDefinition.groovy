@@ -48,6 +48,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
     String invalidSignatureIdTokenJwt
     String invalidIssuerIdTokenJwt
     String invalidNotBeforeIdTokenJwt
+    String unsignedIdTokenJwt
     String clientId = "OOICU812"
     String clientSecret = "VERY_SECRET"
     String authHeader = "Basic " + "${clientId}:${clientSecret}".bytes.encodeBase64().toString()
@@ -193,6 +194,20 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .setKeyId('TEST_PUB_KEY_ID'))
                 .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
                 .compact()
+
+        unsignedIdTokenJwt =  Jwts.builder()
+                .setSubject("00uid4BxXw6I6TV4m0g3")
+                .claim("name", "Joe Coder")
+                .claim("email", "joe.coder@example.com")
+                .claim("preferred_username", "jod.coder@example.com")
+                .setAudience("OOICU812")
+                .setIssuer("http://localhost:9090/oauth2/default")
+                .setIssuedAt(Date.from(now))
+                .setNotBefore(Date.from(now))
+                .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
+                .setHeader(Jwts.jwsHeader()
+                .setKeyId('TEST_PUB_KEY_ID'))
+                .compact()
     }
 
     Map getBindingMap() {
@@ -309,6 +324,17 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                         .withHeader("Content-Type", "application/json;charset=UTF-8")
                         .withBodyFile("token.json")
                         .withTransformer("gstring-template", "idTokenJwt", invalidNotBeforeIdTokenJwt)))
+
+        wireMockServer.stubFor(
+                post(urlPathEqualTo("/oauth2/default/v1/token"))
+                        .withHeader("Authorization", equalTo(authHeader))
+                        .withRequestBody(containing("grant_type=authorization_code"))
+                        .withRequestBody(containing("code=TEST_CODE_unsignedIdTokenJwt&"))
+                        .withRequestBody(matching(".*"+Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" +Pattern.quote("%2Fauthorization-code%2Fcallback")  +".*"))
+                        .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json;charset=UTF-8")
+                        .withBodyFile("token.json")
+                        .withTransformer("gstring-template", "idTokenJwt", unsignedIdTokenJwt)))
 
         wireMockServer.stubFor(
                 get(urlPathEqualTo("/oauth2/default/v1/keys"))
