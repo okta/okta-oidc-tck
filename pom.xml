@@ -21,7 +21,7 @@
         <groupId>com.okta</groupId>
         <artifactId>okta-parent</artifactId>
         <version>2</version>
-        <relativePath>../../../okta-java-parent</relativePath>
+        <relativePath>../okta-java-parent</relativePath>
     </parent>
 
 
