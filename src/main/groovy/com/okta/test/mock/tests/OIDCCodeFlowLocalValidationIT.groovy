@@ -92,7 +92,7 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String code = "TEST_CODE"
         String requestUrl = "http://localhost:${applicationPort}/authorization-code/callback?code=${code}&state=${state}"
 
-        ExtractableResponse response2 = given()
+        given()
             .accept(ContentType.JSON)
             .cookies(response.cookies())
             .redirects()
@@ -111,7 +111,7 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String state = getState(redirectUrl)
         String requestUrl = "http://localhost:${applicationPort}/authorization-code/callback?state=${state}"
 
-        ExtractableResponse response2 = given()
+        given()
             .accept(ContentType.JSON)
             .cookies(response.cookies())
             .redirects()
@@ -243,6 +243,25 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String redirectUrl = response.header("Location")
         String state = getState(redirectUrl)
         String code = "TEST_CODE_invalidNotBeforeIdTokenJwt"
+        String requestUrl = "http://localhost:${applicationPort}/authorization-code/callback?code=${code}&state=${state}"
+
+        given()
+            .accept(ContentType.JSON)
+            .cookies(response.cookies())
+            .redirects()
+                .follow(false)
+        .when()
+            .get(requestUrl)
+        .then()
+            .statusCode(401)
+    }
+
+    @Test
+    void unsignedIdTokenJwtTest() {
+        ExtractableResponse response = redirectToRemoteLogin()
+        String redirectUrl = response.header("Location")
+        String state = getState(redirectUrl)
+        String code = "TEST_CODE_unsignedIdTokenJwt"
         String requestUrl = "http://localhost:${applicationPort}/authorization-code/callback?code=${code}&state=${state}"
 
         given()

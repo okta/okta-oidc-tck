@@ -22,6 +22,7 @@ class Config {
 
 class TestScenario {
     List<String> disabledTests = new ArrayList<>()
+    Boolean enabled
     String command
     List<String> args = new ArrayList<>()
     Map<String, Integer> ports = new HashMap<>()

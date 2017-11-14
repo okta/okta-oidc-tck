@@ -18,6 +18,7 @@ You will need these things:
 - code-flow-remote-validation - Code Flow with remote access token validation
 - implicit-flow-local-validation - Implicit Flow with local access token validation 
 - implicit-flow-remote-validation - Implicit Flow with remote access token validation
+- oidc-code-flow-local-validation - Open ID Connect Code Flow with local access token validation
 
 ## testRunner.yml
 
@@ -28,6 +29,10 @@ Example first:
 ```yml
 scenarios:
   code-flow-local-validation:
+    enabled: true
+    disabledTests:
+      - disabledTest1
+      - disabledTest2
     ports:
       applicationPort: 8080
       mockPort: 9090
@@ -47,6 +52,9 @@ scenarios:
 - `ports` - Optional, if not defined the properties will be set to an available ephemeral port
 - `command' - The script or bin to execute
 - `args` - each args gets a new line
+- `enabled` - Optional, if this scenario doesn't apply, you can set this to false (default set to true) to not run the entire test class
+- `disabledTests` - Tests in a scenario you want to disable. Each disabled test in a scenario gets a new line
+
 
 **Note:** The args will be interpolated with the two ports. The equivalent command line for the above block would be:
 ```bash
@@ -70,7 +78,7 @@ Each forked process gets an individual log file in the format of `target/'${comm
 
 ## Build this project!
 
-This project can be build from this directory with a standard `mvn install`. This will create an uberjar located `target/okta-oauth-mock-test-runner-${target}-shaded.jar`.
+This project can be build from this directory with a standard `mvn install`. This will create an uberjar located `target/okta-oidc-tck-${target}-shaded.jar`.
 
 
 ## Run it already !
@@ -81,11 +89,11 @@ java -cp ${directory-containing-testRunner.yml}:okta-oauth-mock-test-runner-${ve
 
 **NOTE:** One the classpath is the directory containing your `testRunner.yml` not the file itself (this will likely be an arg in the future).
 
-Test it out with this project:
+Test it out with okta-spring-security project (https://github.com/okta/okta-spring-boot):
 ```bash
-cd ../oauth2
+cd okta-spring-security/integration-tests/oauth2/
 mkdir target
-java -cp src/test/resources/:../oauth-mock-test-runner/target/okta-oauth-mock-test-runner-0.2.0-SNAPSHOT-shaded.jar org.testng.TestNG -d target/cli-test-output  ../oauth-mock-test-runner/src/main/resources/testng.xml
+java -cp src/test/resources/:<base-directory>/okta-oidc-tck/target/okta-oidc-tck-0.2.0-SNAPSHOT-shaded.jar org.testng.TestNG -d target/cli-test-output  <base-directory>/okta-oidc-tck/src/main/resources/testng.xml
 ```
 
 ## Run Other Java tests?
