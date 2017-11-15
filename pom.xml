@@ -24,12 +24,15 @@
         <relativePath>../okta-java-parent</relativePath>
     </parent>
 
-
     <groupId>com.okta.tests</groupId>
     <artifactId>okta-oidc-tck</artifactId>
     <version>0.2.0-SNAPSHOT</version>
 
     <name>Okta OAuth2 :: Mock Test Runner</name>
+
+    <properties>
+        <github.slug>okta/okta-oidc-tck</github.slug>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -109,4 +112,39 @@
             </plugin>
         </plugins>
     </build>
+    <!-- this needs to be fixed in the parent pom -->
+    <profiles>
+        <profile>
+            <id>pub-docs</id>
+            <build>
+
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-scm-publish-plugin</artifactId>
+                            <version>1.1</version>
+                            <configuration>
+                                <checkinComment>Publishing javadoc for ${project.artifactId}:${project.version}</checkinComment>
+                                <content>${gh-pages.dir}</content>
+                                <skipDeletedFiles>true</skipDeletedFiles>
+                                <pubScmUrl>scm:git:https://${github.api.key}@github.com/${github.slug}.git</pubScmUrl>
+                                <scmBranch>gh-pages</scmBranch> <!-- branch with static site -->
+                                <checkoutDirectory>${project.build.directory}/scmpublish-checkout-javadoc</checkoutDirectory>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-scm-publish-plugin</artifactId>
+                        <version>1.1</version>
+                        <inherited>false</inherited>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+    <!-- end fix in parent -->
 </project>
