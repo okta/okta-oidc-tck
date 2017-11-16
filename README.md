@@ -84,7 +84,7 @@ This project can be build from this directory with a standard `mvn install`. Thi
 ## Run it already !
 
 ```java
-java -cp ${directory-containing-testRunner.yml}:okta-oauth-mock-test-runner-${version}-shaded.jar org.testng.TestNG -d test-report-directory  your-testng.xml
+java -cp ${directory-containing-testRunner.yml}:okta-oidc-tck-${version}-shaded.jar org.testng.TestNG -d test-report-directory  your-testng.xml
 ```
 
 **NOTE:** One the classpath is the directory containing your `testRunner.yml` not the file itself (this will likely be an arg in the future).
