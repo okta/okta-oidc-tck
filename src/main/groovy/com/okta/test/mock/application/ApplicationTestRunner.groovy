@@ -116,9 +116,15 @@ abstract class ApplicationTestRunner extends HttpMock {
     }
 
     ApplicationUnderTest getApplicationUnderTest(String scenarioName) {
+        Config config
 
-        Config config = new Yaml().loadAs(getClass().getResource( '/testRunner.yml' ).text, Config)
-
+        if (System.getProperty("config") != null) {
+            File yamlFile = new File(System.getProperty("config"))
+            config = new Yaml().loadAs(new FileInputStream(yamlFile), Config)
+        } else {
+            config = new Yaml().loadAs(getClass().getResource( '/testRunner.yml' ).text, Config)
+        }
+        
         Class impl = Class.forName(config.implementation)
         scenario = config.scenarios.get(scenarioName)
 
