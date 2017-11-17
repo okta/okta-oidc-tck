@@ -106,13 +106,6 @@
                         <configuration>
                             <shadedArtifactAttached>true</shadedArtifactAttached>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <artifactSet>
-                                <excludes>
-                                    <exclude>org.codehaus.groovy:groovy-all</exclude>
-                                    <exclude>org.hamcrest:hamcrest-library</exclude>
-                                    <exclude>org.hamcrest:hamcrest-core</exclude>
-                                </excludes>
-                            </artifactSet>
                         </configuration>
                     </execution>
                 </executions>
