@@ -26,7 +26,7 @@
 
     <groupId>com.okta.oidc.tck</groupId>
     <artifactId>okta-oidc-tck</artifactId>
-    <version>0.2.0</version>
+    <version>0.2.1-SNAPSHOT</version>
 
     <name>Okta OAuth2 :: Mock Test Runner</name>
 
@@ -170,8 +170,4 @@
         </profile>
     </profiles>
     <!-- end fix in parent -->
-
-  <scm>
-    <tag>okta-oidc-tck-0.2.0</tag>
-  </scm>
 </project>
