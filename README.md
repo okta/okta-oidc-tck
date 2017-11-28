@@ -50,7 +50,7 @@ scenarios:
 
 - `scenarios` - The top level scenarios defines how the individual scenarios are run
 - `ports` - Optional, if not defined the properties will be set to an available ephemeral port
-- `command' - The script or bin to execute
+- `command` - The script or bin to execute
 - `args` - each args gets a new line
 - `enabled` - Optional, if this scenario doesn't apply, you can set this to false (default set to true) to not run the entire test class
 - `disabledTests` - Tests in a scenario you want to disable. Each disabled test in a scenario gets a new line
