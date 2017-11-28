@@ -28,7 +28,7 @@ import static com.okta.test.mock.scenarios.Scenario.IMPLICIT_FLOW_LOCAL_VALIDATI
 @Scenario(IMPLICIT_FLOW_LOCAL_VALIDATION)
 class ImplicitLocalValidationIT extends ApplicationTestRunner {
     @Test
-    void noToken401() {
+    void noToken401Test() {
         given()
             .redirects()
             .follow(false)
@@ -41,7 +41,7 @@ class ImplicitLocalValidationIT extends ApplicationTestRunner {
     }
 
     @Test
-    void accessKeyNonTrustedKey() {
+    void accessKeyNonTrustedKeyTest() {
         given()
             .header("Authorization", "Bearer ${IMPLICIT_FLOW_LOCAL_VALIDATION.definition.invalidAccessTokenJwt}")
             .redirects()
@@ -54,7 +54,7 @@ class ImplicitLocalValidationIT extends ApplicationTestRunner {
     }
 
     @Test
-    void nonJWTAccessKey() {
+    void nonJWTAccessKeyTest() {
         given()
             .header("Authorization", "Bearer not-a-jwt")
             .redirects()
@@ -69,7 +69,7 @@ class ImplicitLocalValidationIT extends ApplicationTestRunner {
     @Test
     void wrongAudienceAccessTokenTest() {
         given()
-            .header("Authorization", "Bearer ${IMPLICIT_FLOW_LOCAL_VALIDATION.definition.wrongAudienceAccessToken}")
+            .header("Authorization", "Bearer ${IMPLICIT_FLOW_LOCAL_VALIDATION.definition.wrongAudienceAccessTokenJwt}")
             .redirects()
                 .follow(false)
         .when()
@@ -80,7 +80,7 @@ class ImplicitLocalValidationIT extends ApplicationTestRunner {
     }
 
     @Test
-    void scopeAccessTest() {
+    void scopeAccessTokenTest() {
         given()
             .header("Authorization", "Bearer ${IMPLICIT_FLOW_LOCAL_VALIDATION.definition.accessTokenJwt}")
             .redirects()
@@ -88,11 +88,12 @@ class ImplicitLocalValidationIT extends ApplicationTestRunner {
         .when()
             .get("http://localhost:${applicationPort}/")
         .then()
+            .statusCode(200)
             .body(Matchers.equalTo("The message of the day is boring: joe.coder@example.com"))
     }
 
     @Test
-    void wrongScopeAccessToken() {
+    void wrongScopeAccessTokenTest() {
         given()
             .header("Authorization", "Bearer ${IMPLICIT_FLOW_LOCAL_VALIDATION.definition.wrongScopeAccessTokenJwt}")
             .redirects()
@@ -101,5 +102,17 @@ class ImplicitLocalValidationIT extends ApplicationTestRunner {
             .get("http://localhost:${applicationPort}/")
         .then()
             .statusCode(403)
+    }
+
+    @Test
+    void inactiveAccessTokenTest() {
+        given()
+            .header("Authorization", "Bearer ${IMPLICIT_FLOW_LOCAL_VALIDATION.definition.inactiveAccessTokenJwt}")
+            .redirects()
+                .follow(false)
+        .when()
+            .get("http://localhost:${applicationPort}/")
+        .then()
+            .statusCode(401)
     }
 }

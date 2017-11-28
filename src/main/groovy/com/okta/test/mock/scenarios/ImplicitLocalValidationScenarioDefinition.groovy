@@ -37,7 +37,9 @@ class ImplicitLocalValidationScenarioDefinition implements ScenarioDefinition {
     String accessTokenJwt
     String wrongScopeAccessTokenJwt
     String invalidAccessTokenJwt
-    String wrongAudienceAccessToken
+    String wrongAudienceAccessTokenJwt
+    String inactiveAccessTokenJwt
+    String expiredAccessTokenJwt
     String idTokenjwt
 
     ImplicitLocalValidationScenarioDefinition() {
@@ -59,6 +61,32 @@ class ImplicitLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .setIssuedAt(Date.from(now))
                 .setNotBefore(Date.from(now))
                 .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
+                .setHeader(Jwts.jwsHeader()
+                .setKeyId('TEST_PUB_KEY_ID'))
+                .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
+                .compact()
+
+        inactiveAccessTokenJwt =  Jwts.builder()
+                .setSubject("joe.coder@example.com")
+                .setAudience("api://default")
+                .claim("scp", ["profile", "openid", "email"])
+                .claim("groups", ["Everyone", "Test-Group"])
+                .setIssuedAt(Date.from(now))
+                .setNotBefore(Date.from(now.plus(1, ChronoUnit.HOURS)))
+                .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
+                .setHeader(Jwts.jwsHeader()
+                .setKeyId('TEST_PUB_KEY_ID'))
+                .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
+                .compact()
+
+        expiredAccessTokenJwt =  Jwts.builder()
+                .setSubject("joe.coder@example.com")
+                .setAudience("api://default")
+                .claim("scp", ["profile", "openid", "email"])
+                .claim("groups", ["Everyone", "Test-Group"])
+                .setIssuedAt(Date.from(now))
+                .setNotBefore(Date.from(now))
+                .setExpiration(Date.from(now.minus(1, ChronoUnit.HOURS)))
                 .setHeader(Jwts.jwsHeader()
                 .setKeyId('TEST_PUB_KEY_ID'))
                 .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
@@ -90,7 +118,7 @@ class ImplicitLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .signWith(SignatureAlgorithm.RS256, invalidKeyPair.private)
                 .compact()
 
-        wrongAudienceAccessToken =  Jwts.builder()
+        wrongAudienceAccessTokenJwt =  Jwts.builder()
                 .setSubject("joe.coder@example.com")
                 .setAudience("api://something-else")
                 .claim("scp", ["profile", "openid", "email"])
@@ -100,7 +128,7 @@ class ImplicitLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
                 .setHeader(Jwts.jwsHeader()
                 .setKeyId('TEST_PUB_KEY_ID'))
-                .signWith(SignatureAlgorithm.RS256, invalidKeyPair.private)
+                .signWith(SignatureAlgorithm.RS256, keyPair.private)
                 .compact()
 
         idTokenjwt =  Jwts.builder()
@@ -109,7 +137,6 @@ class ImplicitLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .claim("email", "joe.coder@example.com")
                 .claim("preferred_username", "jod.coder@example.com")
                 .setAudience("api://default")
-                .setIssuer("http://localhost:9988/oauth2/default")
                 .setIssuedAt(Date.from(now))
                 .setNotBefore(Date.from(now))
                 .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
