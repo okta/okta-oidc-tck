@@ -28,20 +28,44 @@ describe('Okta Hosted Login Flow', () => {
   });
  
   it('can login with Okta as the IDP', async () => {
+    let username, password;
+
+    // You can pass username, password for the tests either through env vars or protractor configuration
+    // Env var takes precedence. If not set, the value in conf.js will be used
+    if (process.env.username) {
+      username = process.env.username;
+    } else {
+      username = browser.params.login.username;
+    }
+
+    if (process.env.password) {
+      password = process.env.password;
+    } else {
+      password = browser.params.login.password;
+    }
+
     browser.get('http://localhost:8080/');
     loginHomePage.waitForPageLoad();
 
     loginHomePage.clickLoginButton();
     oktaSignInPage.waitForPageLoad();
 
-    await oktaSignInPage.login('george', 'Asdf1234');
+    await oktaSignInPage.login(username, password);
     authenticatedHomePage.waitForPageLoad();
   });
 
   it('can access user profile', async () => {
+    let email;
+
+    if (process.env.email) {
+      email = process.env.email;
+    } else {
+      email = browser.params.login.email;
+    }
+
     authenticatedHomePage.viewProfile();
     profile.waitForPageLoad();
-    expect(profile.containsClaim('george@acme.com')).toBe(true);
+    expect(profile.containsClaim(email)).toBe(true);
   });
 
   it('can log the user out', async () => {

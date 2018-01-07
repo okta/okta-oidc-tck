@@ -28,13 +28,29 @@ describe('Resource server Flow', () => {
   });
  
   it('can access resource server messages after login', async () => {
+    let username, password;
+
+    // You can pass username, password for the tests either through env vars or protractor configuration
+    // Env vars takes precedence. If not set, the value in conf.js will be used
+    if (process.env.username) {
+      username = process.env.username;
+    } else {
+      username = browser.params.login.username;
+    }
+
+    if (process.env.password) {
+      password = process.env.password;
+    } else {
+      password = browser.params.login.password;
+    }
+
     browser.get('http://localhost:8080/');
     loginHomePage.waitForPageLoad();
 
     loginHomePage.clickLoginButton();
     oktaSignInPage.waitForPageLoad();
 
-    await oktaSignInPage.login('george', 'Asdf1234');
+    await oktaSignInPage.login(username, password);
     authenticatedHomePage.waitForPageLoad();
 
     authenticatedHomePage.viewMessages();

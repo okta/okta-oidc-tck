@@ -21,6 +21,13 @@ const promises = Promise.all([
 ]);
 
 const config = {
+  // Update these parameters to match your environment for tests
+  params: {
+    login: {
+      username: 'george',
+      password: 'Asdf1234'
+    }
+  },
   framework: 'jasmine2',
   beforeLaunch() {
     return promises;
