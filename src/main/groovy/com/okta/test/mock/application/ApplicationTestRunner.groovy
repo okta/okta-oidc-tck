@@ -62,6 +62,10 @@ abstract class ApplicationTestRunner extends HttpMock {
         return mockPort
     }
 
+    String getLoginRedirectPath() {
+        return app.getTestScenario().loginRedirectPath
+    }
+
     @BeforeMethod
     void checkToRun(Method method) {
         if (scenario.enabled == false) {
@@ -83,7 +87,7 @@ abstract class ApplicationTestRunner extends HttpMock {
 
         startMockServer()
         app.start()
-
+        
         // allow for CI to configure the timeout
         String retryCountKey = "okta.test.startPollCount"
         String envRetryCountKey = retryCountKey.replace('.', '_').toUpperCase(Locale.ENGLISH)

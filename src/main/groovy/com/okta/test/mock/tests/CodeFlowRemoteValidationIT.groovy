@@ -32,12 +32,22 @@ import static com.okta.test.mock.scenarios.Scenario.CODE_FLOW_REMOTE_VALIDATION
 class CodeFlowRemoteValidationIT extends ApplicationTestRunner {
     @Test
     void redirectToLogin() {
+        // Samples are updated to have a login button on home page
+        // Redirect to login occurs when user tries to access an unauthenticated page
+        // Now clients can set a path relative to home page that redirects to login
+        // System property "redirect.path" or scenario property "loginRedirectPath" can be used
+        String loginRedirectPath = System.getProperty("redirect.path");
+        if (loginRedirectPath == null) {
+            // Check if the login redirect path is set in the scenario properties
+            loginRedirectPath = getLoginRedirectPath()
+        }
+
         given()
             .redirects()
                 .follow(false)
             .accept(ContentType.JSON)
         .when()
-            .get("http://localhost:${applicationPort}/")
+            .get("http://localhost:${applicationPort}/" + loginRedirectPath)
         .then()
             .statusCode(302)
             .header("Location", is("http://localhost:${applicationPort}/authorization-code/callback".toString()))
