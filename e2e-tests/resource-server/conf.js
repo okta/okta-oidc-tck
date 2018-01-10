@@ -1,5 +1,5 @@
 /*!
- * Copyright (c) 2015-2016, Okta, Inc. and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015-2018, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
  *
  * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
@@ -21,12 +21,14 @@ const promises = Promise.all([
 ]);
 
 const config = {
-  // Update these parameters to match your environment for tests
+  // Set the following env vars to match your test environment
+  // Note the USERNAME should be of the form "username@email.com"
   params: {
     login: {
-      username: 'george',
-      password: 'Asdf1234'
-    }
+      username: process.env.USERNAME,
+      password: process.env.PASSWORD
+    },
+    appRoot: 'http://localhost:8080'
   },
   framework: 'jasmine2',
   beforeLaunch() {

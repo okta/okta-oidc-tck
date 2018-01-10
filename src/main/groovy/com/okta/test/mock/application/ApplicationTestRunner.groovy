@@ -24,7 +24,7 @@ import org.junit.Assert
 import org.testng.annotations.AfterClass
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.BeforeMethod
-import org.testng.SkipException; 
+import org.testng.SkipException;
 import org.testng.util.Strings
 import org.yaml.snakeyaml.Yaml
 
@@ -83,11 +83,11 @@ abstract class ApplicationTestRunner extends HttpMock {
     void start() {
         if (scenario.enabled == false) {
             return;
-        }    
+        }
 
         startMockServer()
         app.start()
-        
+
         // allow for CI to configure the timeout
         String retryCountKey = "okta.test.startPollCount"
         String envRetryCountKey = retryCountKey.replace('.', '_').toUpperCase(Locale.ENGLISH)
@@ -95,12 +95,12 @@ abstract class ApplicationTestRunner extends HttpMock {
 
         pollForStartedApplication(applicationPort, value.toInteger())
     }
-    
+
     @AfterClass
     void stop() {
         if (scenario.enabled == false) {
             return;
-        }   
+        }
         int exitStatus = app.stop()
         assertThat("exit status was not 0 or 143 (SIGTERM)", exitStatus==0 || exitStatus==143)
     }
@@ -128,14 +128,14 @@ abstract class ApplicationTestRunner extends HttpMock {
         } else {
             config = new Yaml().loadAs(getClass().getResource( '/testRunner.yml' ).text, Config)
         }
-        
+
         Class impl = Class.forName(config.implementation)
         scenario = config.scenarios.get(scenarioName)
 
         // figure out which ports we need
         applicationPort = getPort("applicationPort", scenario)
         mockPort = getPort("mockPort", scenario)
-        
+
         // interpolate the scenario args with the ports
         def templateEngine = new StreamingTemplateEngine()
         def binding = [applicationPort: applicationPort, mockPort: mockPort]

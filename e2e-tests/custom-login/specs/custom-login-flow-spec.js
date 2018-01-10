@@ -1,5 +1,5 @@
 /*!
- * Copyright (c) 2015-2016, Okta, Inc. and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015-2018, Okta, Inc. and/or its affiliates. All rights reserved.
  * The Okta software accompanied by this notice is provided pursuant to the Apache License, Version 2.0 (the "License.")
  *
  * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
@@ -28,44 +28,24 @@ describe('Custom Login Flow', () => {
   });
  
   it('can login with Okta as the IDP using custom signin page', async () => {
-    let username, password;
-
-    // You can pass username, password for the tests either through env vars or protractor configuration
-    // Env var takes precedence. If not set, the value in conf.js will be used
-    if (process.env.username) {
-      username = process.env.username;
-    } else {
-      username = browser.params.login.username;
-    }
-
-    if (process.env.password) {
-      password = process.env.password;
-    } else {
-      password = browser.params.login.password;
-    }
-
-    browser.get('http://localhost:8080/');
+    browser.get(browser.params.appRoot);
     loginHomePage.waitForPageLoad();
 
     loginHomePage.clickLoginButton();
     customSignInPage.waitForPageLoad();
 
-    await customSignInPage.login(username, password);
+    // Verify that curent domain hasn't changed to okta-hosted login, rather a local custom login page
+    expect(customSignInPage.urlContains('okta')).toBe(false);
+    expect(customSignInPage.urlContains(browser.params.appRoot)).toBe(true);
+
+    await customSignInPage.login(browser.params.login.username, browser.params.login.password);
     authenticatedHomePage.waitForPageLoad();
   });
 
   it('can access user profile', async () => {
-    let email;
-
-    if (process.env.email) {
-      email = process.env.email;
-    } else {
-      email = browser.params.login.email;
-    }
-
     authenticatedHomePage.viewProfile();
     profile.waitForPageLoad();
-    expect(profile.containsClaim(email)).toBe(true);
+    expect(profile.getEmailClaim()).toBe(browser.params.login.email);
   });
 
   it('can log the user out', async () => {
