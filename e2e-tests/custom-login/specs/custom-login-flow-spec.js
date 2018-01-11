@@ -16,17 +16,19 @@ const LoginHomePage = require('../../page-objects/shared/login-home-page');
 const CustomSignInPage = require('../../page-objects/custom-signin-page');
 const AuthenticatedHomePage = require('../../page-objects/shared/authenticated-home-page');
 const ProfilePage = require('../../page-objects/shared/profile-page');
+const MessagesPage = require('../../page-objects/messages-page');
 
 describe('Custom Login Flow', () => {
   const loginHomePage = new LoginHomePage();
   const customSignInPage = new CustomSignInPage();
   const authenticatedHomePage = new AuthenticatedHomePage();
   const profile = new ProfilePage();
+  const messagesPage = new MessagesPage();
 
   beforeEach(() => {
     browser.ignoreSynchronization = true;
   });
- 
+
   it('can login with Okta as the IDP using custom signin page', async () => {
     browser.get(browser.params.appRoot);
     loginHomePage.waitForPageLoad();
@@ -48,7 +50,19 @@ describe('Custom Login Flow', () => {
     expect(profile.getEmailClaim()).toBe(browser.params.login.email);
   });
 
+  it('can access resource server messages after login', async () => {
+    // If it's not implicit flow, don't test messages resource server
+    if (process.env.TEST_TYPE !== 'implicit') {
+      return;
+    }
+    authenticatedHomePage.viewMessages();
+    messagesPage.waitForPageLoad();
+    expect(messagesPage.getMessage()).toBeTruthy();
+  });
+
   it('can log the user out', async () => {
+    browser.get(browser.params.appRoot);
+    authenticatedHomePage.waitForPageLoad();
     authenticatedHomePage.logout();
     loginHomePage.waitForPageLoad();
   });
