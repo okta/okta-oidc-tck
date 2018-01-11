@@ -16,7 +16,8 @@ const jasmineReporters = require('jasmine-reporters');
 const daemonUtil = require('../tools/daemon-util');
 
 const promises = Promise.all([
-  daemonUtil.startCustomLoginServer()
+  daemonUtil.startCustomLoginServer(),
+  daemonUtil.startResourceServer()
 ]);
 
 const config = {
@@ -57,7 +58,7 @@ if (process.env.TRAVIS) {
   config.capabilities = {
     'browserName': 'chrome',
     chromeOptions: {
-      args: ['--headless','--disable-gpu','--window-size=1600x1200']
+      args: ['--headless','--disable-gpu','--window-size=1600x1200','--no-sandbox']
     }
   }
 } else {
