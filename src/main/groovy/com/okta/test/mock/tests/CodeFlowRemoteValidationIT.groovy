@@ -47,7 +47,7 @@ class CodeFlowRemoteValidationIT extends ApplicationTestRunner {
                 .follow(false)
             .accept(ContentType.JSON)
         .when()
-            .get("http://localhost:${applicationPort}/" + loginRedirectPath)
+            .get("http://localhost:${applicationPort}/${loginRedirectPath}")
         .then()
             .statusCode(302)
             .header("Location", is("http://localhost:${applicationPort}/authorization-code/callback".toString()))

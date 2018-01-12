@@ -29,7 +29,9 @@ const config = {
       password: process.env.PASSWORD,
       email: process.env.USERNAME,
     },
-    appRoot: 'http://localhost:8080'
+    // App servers start on port 8080 but configurable using env var
+    appPort: process.env.PORT || 8080,
+    appTimeOut: process.env.TIMEOUT || 1000
   },
   framework: 'jasmine2',
   beforeLaunch() {
@@ -45,7 +47,7 @@ const config = {
     promises.then((childProcesses) => {
       childProcesses.forEach(child => child.stop());
     });
-    return new Promise(resolve => setTimeout(() => resolve(), 1000));
+    return new Promise(resolve => setTimeout(() => resolve(), browser.params.appTimeOut));
   },
   specs: ['specs/*.js'],
   restartBrowserBetweenTests: false,
