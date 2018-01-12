@@ -24,13 +24,14 @@ describe('Custom Login Flow', () => {
   const authenticatedHomePage = new AuthenticatedHomePage();
   const profile = new ProfilePage();
   const messagesPage = new MessagesPage();
+  const appRoot = `http://localhost:${browser.params.appPort}`;
 
   beforeEach(() => {
     browser.ignoreSynchronization = true;
   });
 
   it('can login with Okta as the IDP using custom signin page', async () => {
-    browser.get(browser.params.appRoot);
+    browser.get(appRoot);
     loginHomePage.waitForPageLoad();
 
     loginHomePage.clickLoginButton();
@@ -38,7 +39,7 @@ describe('Custom Login Flow', () => {
 
     // Verify that curent domain hasn't changed to okta-hosted login, rather a local custom login page
     expect(customSignInPage.urlContains('okta')).toBe(false);
-    expect(customSignInPage.urlContains(browser.params.appRoot)).toBe(true);
+    expect(customSignInPage.urlContains(appRoot)).toBe(true);
 
     await customSignInPage.login(browser.params.login.username, browser.params.login.password);
     authenticatedHomePage.waitForPageLoad();
@@ -61,7 +62,7 @@ describe('Custom Login Flow', () => {
   });
 
   it('can log the user out', async () => {
-    browser.get(browser.params.appRoot);
+    browser.get(appRoot);
     authenticatedHomePage.waitForPageLoad();
     authenticatedHomePage.logout();
     loginHomePage.waitForPageLoad();
