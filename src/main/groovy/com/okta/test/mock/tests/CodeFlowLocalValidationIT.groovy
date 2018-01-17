@@ -19,6 +19,7 @@ import com.okta.test.mock.Scenario
 import com.okta.test.mock.application.ApplicationTestRunner
 import io.restassured.http.ContentType
 import io.restassured.response.ExtractableResponse
+import org.hamcrest.Matcher
 import org.hamcrest.Matchers
 import org.testng.annotations.Test
 import java.util.regex.Pattern
@@ -83,7 +84,7 @@ class CodeFlowLocalValidationIT extends ApplicationTestRunner {
             .get("http://localhost:${applicationPort}/authorization-code/callback")
         .then()
             .statusCode(200)
-            .body(Matchers.equalTo("<html>fake_login_page<html/>"))
+            .body(loginPageMatcher())
     }
 
     @Test
@@ -242,5 +243,9 @@ class CodeFlowLocalValidationIT extends ApplicationTestRunner {
             .get(requestUrl)
         .then()
             .statusCode(401)
+    }
+
+    protected Matcher<?> loginPageMatcher() {
+        return Matchers.equalTo("<html>fake_login_page<html/>")
     }
 }
