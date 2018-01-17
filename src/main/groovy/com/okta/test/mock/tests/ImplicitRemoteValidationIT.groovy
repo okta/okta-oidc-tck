@@ -33,7 +33,7 @@ class ImplicitRemoteValidationIT extends ApplicationTestRunner {
             .follow(false)
             .accept(ContentType.JSON)
         .when()
-            .get("http://localhost:${applicationPort}/")
+            .get("http://localhost:${applicationPort}/api/messages")
         .then()
             .statusCode(401)
             .header("WWW-Authenticate", startsWith("Bearer realm="))
@@ -46,7 +46,7 @@ class ImplicitRemoteValidationIT extends ApplicationTestRunner {
             .redirects()
                 .follow(false)
         .when()
-            .get("http://localhost:${applicationPort}/")
+            .get("http://localhost:${applicationPort}/api/messages")
         .then()
             .statusCode(403)
     }
