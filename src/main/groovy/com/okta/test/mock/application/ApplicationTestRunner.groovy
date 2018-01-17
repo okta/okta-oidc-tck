@@ -24,11 +24,11 @@ import org.junit.Assert
 import org.testng.annotations.AfterClass
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.BeforeMethod
-import org.testng.SkipException;
+import org.testng.SkipException
 import org.testng.util.Strings
 import org.yaml.snakeyaml.Yaml
 
-import java.lang.reflect.Method;
+import java.lang.reflect.Method
 import java.util.stream.Collectors
 
 import static io.restassured.RestAssured.given
@@ -82,7 +82,7 @@ abstract class ApplicationTestRunner extends HttpMock {
     @BeforeClass
     void start() {
         if (scenario.enabled == false) {
-            return;
+            throw new SkipException("Skipping the disabled scenario")
         }
 
         startMockServer()
@@ -99,7 +99,7 @@ abstract class ApplicationTestRunner extends HttpMock {
     @AfterClass
     void stop() {
         if (scenario.enabled == false) {
-            return;
+            return
         }
         int exitStatus = app.stop()
         assertThat("exit status was not 0 or 143 (SIGTERM)", exitStatus==0 || exitStatus==143)
@@ -131,6 +131,13 @@ abstract class ApplicationTestRunner extends HttpMock {
 
         Class impl = Class.forName(config.implementation)
         scenario = config.scenarios.get(scenarioName)
+
+        // if the scenario is not defined, just skip it
+        if (scenario == null) {
+            scenario = new TestScenario()
+            scenario.enabled = false
+            return null
+        }
 
         // figure out which ports we need
         applicationPort = getPort("applicationPort", scenario)
