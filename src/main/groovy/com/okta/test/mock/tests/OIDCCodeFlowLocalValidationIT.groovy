@@ -19,6 +19,7 @@ import com.okta.test.mock.Scenario
 import com.okta.test.mock.application.ApplicationTestRunner
 import io.restassured.http.ContentType
 import io.restassured.response.ExtractableResponse
+import org.hamcrest.Matcher
 import org.hamcrest.Matchers
 import org.testng.annotations.Test
 import java.util.regex.Pattern
@@ -60,7 +61,7 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
             .get("http://localhost:${applicationPort}/login")
         .then()
             .statusCode(200)
-            .body(Matchers.equalTo("<html>fake_login_page<html/>"))
+            .body(loginPageMatcher())
     }
 
     @Test
@@ -287,5 +288,9 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
             }   
         }
         return state
+    }
+
+    protected Matcher<?> loginPageMatcher() {
+        return Matchers.equalTo("<html>fake_login_page<html/>")
     }
 }
