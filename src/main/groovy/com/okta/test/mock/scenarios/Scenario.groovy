@@ -20,6 +20,8 @@ import org.slf4j.LoggerFactory
 enum Scenario {
     CODE_FLOW_LOCAL_VALIDATION("code-flow-local-validation", new CodeLocalValidationScenarioDefinition()),
     CODE_FLOW_REMOTE_VALIDATION("code-flow-remote-validation", new CodeRemoteValidationScenarioDefinition()),
+    CUSTOM_CODE_FLOW_LOCAL_VALIDATION("custom-code-flow-local-validation", new CodeLocalValidationScenarioDefinition()),
+    CUSTOM_CODE_FLOW_REMOTE_VALIDATION("custom-code-flow-remote-validation", new CodeRemoteValidationScenarioDefinition()),
     IMPLICIT_FLOW_LOCAL_VALIDATION("implicit-flow-local-validation", new ImplicitLocalValidationScenarioDefinition()),
     IMPLICIT_FLOW_REMOTE_VALIDATION("implicit-flow-remote-validation", new ImplicitRemoteValidationScenarioDefinition()),
     OIDC_CODE_FLOW_LOCAL_VALIDATION("oidc-code-flow-local-validation", new OIDCCodeLocalValidationScenarioDefinition())
@@ -28,6 +30,8 @@ enum Scenario {
     static {
         LOOKUP_MAP.put( CODE_FLOW_LOCAL_VALIDATION.id, CODE_FLOW_LOCAL_VALIDATION)
         LOOKUP_MAP.put( CODE_FLOW_REMOTE_VALIDATION.id, CODE_FLOW_REMOTE_VALIDATION)
+        LOOKUP_MAP.put( CUSTOM_CODE_FLOW_LOCAL_VALIDATION.id, CUSTOM_CODE_FLOW_LOCAL_VALIDATION)
+        LOOKUP_MAP.put( CUSTOM_CODE_FLOW_REMOTE_VALIDATION.id, CUSTOM_CODE_FLOW_REMOTE_VALIDATION)
         LOOKUP_MAP.put( IMPLICIT_FLOW_LOCAL_VALIDATION.id, IMPLICIT_FLOW_LOCAL_VALIDATION)
         LOOKUP_MAP.put( IMPLICIT_FLOW_REMOTE_VALIDATION.id, IMPLICIT_FLOW_REMOTE_VALIDATION)
         LOOKUP_MAP.put( OIDC_CODE_FLOW_LOCAL_VALIDATION.id, OIDC_CODE_FLOW_LOCAL_VALIDATION)
