@@ -81,7 +81,7 @@ class CodeFlowRemoteValidationIT extends ApplicationTestRunner {
         given()
             .accept(ContentType.JSON)
         .when()
-            .get("http://localhost:${applicationPort}/")
+            .get("http://localhost:${applicationPort}/profile")
         .then()
             .statusCode(200)
             .body(loginPageMatcher())
