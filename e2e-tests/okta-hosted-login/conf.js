@@ -11,60 +11,10 @@
  */
 
 /* eslint import/no-unresolved:0, import/no-extraneous-dependencies:0, no-console:0 */
-/* global jasmine */
-const jasmineReporters = require('jasmine-reporters');
 const daemonUtil = require('../tools/daemon-util');
+const commonConfig = require('../tools/common-config');
 
-const promises = Promise.all([
+module.exports.config = commonConfig.configure(Promise.all([
   daemonUtil.startOktaHostedLoginServer(),
   daemonUtil.startResourceServer()
-]);
-
-const config = {
-  // Set the following env vars to match your test environment
-  // Note the USERNAME should be of the form "username@email.com"
-  params: {
-    login: {
-      username: process.env.USERNAME,
-      password: process.env.PASSWORD,
-      email: process.env.USERNAME,
-    },
-    // App servers start on port 8080 but configurable using env var
-    appPort: process.env.PORT || 8080,
-    appTimeOut: process.env.TIMEOUT || 1000
-  },
-  framework: 'jasmine2',
-  beforeLaunch() {
-    return promises;
-  },
-  onPrepare() {
-    jasmine.getEnv().addReporter(new jasmineReporters.JUnitXmlReporter({
-      savePath: 'build2/reports/junit',
-      filePrefix: 'results',
-    }));
-  },
-  afterLaunch() {
-    promises.then((childProcesses) => {
-      childProcesses.forEach(child => child.stop());
-    });
-    return new Promise(resolve => setTimeout(() => resolve(), browser.params.appTimeOut));
-  },
-  specs: ['specs/*.js'],
-  restartBrowserBetweenTests: false,
-  capabilities: {},
-};
-
-// Run Headless chrome in Travis, else Chrome
-if (process.env.TRAVIS) {
-  console.log('-- Using Chrome Headless --');
-  config.capabilities = {
-    'browserName': 'chrome',
-    chromeOptions: {
-      args: ['--headless','--disable-gpu','--window-size=1600x1200','--no-sandbox']
-    }
-  }
-} else {
-  config.capabilities.browserName = 'chrome';
-}
-
-module.exports.config = config;
+]));
