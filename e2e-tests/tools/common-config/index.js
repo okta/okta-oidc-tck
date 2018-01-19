@@ -16,7 +16,7 @@
 /* global jasmine */
 const jasmineReporters = require('jasmine-reporters');
 
-var commonConfig = module.exports = {};
+const commonConfig = module.exports = {};
 
 commonConfig.configure = function (promises) {
   const config = {
