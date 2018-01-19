@@ -67,7 +67,7 @@ commonConfig.configure = function (promises) {
   else if (process.env.CHROME_HEADLESS || process.env.TRAVIS) {
     console.log('-- Using Chrome Headless --');
     config.capabilities.chromeOptions = {
-      args: ['--headless','--disable-gpu','--window-size=1600x1200']
+      args: ['--headless','--disable-gpu','--window-size=1600x1200', '--no-sandbox']
     }
   }
   // otherwise just launch the browser locally
