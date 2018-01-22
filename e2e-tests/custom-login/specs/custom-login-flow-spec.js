@@ -38,8 +38,8 @@ describe('Custom Login Flow', () => {
     customSignInPage.waitForPageLoad();
 
     // Verify that curent domain hasn't changed to okta-hosted login, rather a local custom login page
-    expect(customSignInPage.urlContains('okta')).toBe(false);
-    expect(customSignInPage.urlContains(appRoot)).toBe(true);
+    expect(browser.getCurrentUrl()).not.toContain('okta');
+    expect(browser.getCurrentUrl()).toContain(appRoot);
 
     await customSignInPage.login(browser.params.login.username, browser.params.login.password);
     authenticatedHomePage.waitForPageLoad();

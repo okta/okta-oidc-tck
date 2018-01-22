@@ -38,8 +38,8 @@ describe('Okta Hosted Login Flow', () => {
     oktaSignInPage.waitForPageLoad();
 
     // Verify that curent domain has changed to okta-hosted login page
-    expect(oktaSignInPage.urlContains('okta')).toBe(true);
-    expect(oktaSignInPage.urlContains(appRoot)).toBe(false);
+    expect(browser.getCurrentUrl()).toContain('okta');
+    expect(browser.getCurrentUrl()).not.toContain(appRoot);
 
     await oktaSignInPage.login(browser.params.login.username, browser.params.login.password);
     authenticatedHomePage.waitForPageLoad();
