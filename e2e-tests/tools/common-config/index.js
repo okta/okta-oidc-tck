@@ -62,6 +62,7 @@ commonConfig.configure = function (promises) {
     config.capabilities.tunnelIdentifier = process.env.TRAVIS_JOB_NUMBER;
     config.capabilities.build = process.env.TRAVIS_BUILD_NUMBER;
     config.capabilities.screenResolution = '1600x1200';
+    config.capabilities.extendedDebugging = true;
   }
   // Run Chrome Headless
   else if (process.env.CHROME_HEADLESS || process.env.TRAVIS) {
