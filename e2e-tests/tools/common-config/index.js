@@ -68,7 +68,12 @@ commonConfig.configure = function (promises) {
   else if (process.env.CHROME_HEADLESS || process.env.TRAVIS) {
     console.log('-- Using Chrome Headless --');
     config.capabilities.chromeOptions = {
-      args: ['--headless','--disable-gpu','--window-size=1600x1200', '--no-sandbox']
+      args: ['--headless','--disable-gpu','--window-size=1600x1200']
+    };
+
+    // work around for chrome crashes on Travis-CI
+    if (process.env.TRAVIS) {
+      config.capabilities.chromeOptions.args.push('--no-sandbox');
     }
   }
   // otherwise just launch the browser locally
