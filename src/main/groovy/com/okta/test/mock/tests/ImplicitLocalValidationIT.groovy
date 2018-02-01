@@ -21,6 +21,7 @@ import io.restassured.http.ContentType
 import org.hamcrest.Matchers
 import org.testng.annotations.Test
 
+import static org.hamcrest.Matchers.hasItems
 import static io.restassured.RestAssured.given
 import static org.hamcrest.Matchers.startsWith
 import static com.okta.test.mock.scenarios.Scenario.IMPLICIT_FLOW_LOCAL_VALIDATION
