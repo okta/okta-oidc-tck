@@ -99,16 +99,10 @@ daemonUtil.startCustomLoginServer = () => startAndWait({
   ],
 });
 
-// Start the resource server only for implicit flow
-daemonUtil.startResourceServer = () => {
-  if (process.env.TEST_TYPE === 'implicit') {
-    return startAndWait({
-      script: 'resource-server',
-      color: 'green',
-      resources: [
-        `tcp:8000`,
-      ]
-    });
-  }
-  return Promise.resolve();
-}
+daemonUtil.startResourceServer = () => startAndWait({
+  script: 'resource-server',
+  color: 'green',
+  resources: [
+    `tcp:8000`,
+  ]
+});
