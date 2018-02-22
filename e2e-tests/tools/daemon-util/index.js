@@ -109,7 +109,6 @@ daemonUtil.startResourceServer = () => {
         `tcp:8000`,
       ]
     });
-  } else {
-    return (Promise.resolve());
   }
+  return Promise.resolve();
 }
