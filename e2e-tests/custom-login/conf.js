@@ -14,7 +14,14 @@
 const daemonUtil = require('../tools/daemon-util');
 const commonConfig = require('../tools/common-config');
 
-module.exports.config = commonConfig.configure(Promise.all([
-  daemonUtil.startCustomLoginServer(),
-  daemonUtil.startResourceServer()
-]));
+// Start the resource server only for implicit flow
+if (process.env.TEST_TYPE === 'implicit') {
+  module.exports.config = commonConfig.configure(Promise.all([
+    daemonUtil.startCustomLoginServer(),
+    daemonUtil.startResourceServer()
+  ]));
+} else {
+  module.exports.config = commonConfig.configure(Promise.all([
+    daemonUtil.startCustomLoginServer()
+  ]));
+}
