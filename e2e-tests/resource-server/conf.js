@@ -18,7 +18,6 @@ const commonConfig = require('../tools/common-config');
 if (process.env.TEST_TYPE === 'implicit') {
 
 } else {
-    console.log('start');
     module.exports.config = commonConfig.configure(Promise.all([
         daemonUtil.startResourceServer()
     ]));
