@@ -14,11 +14,6 @@
 const daemonUtil = require('../tools/daemon-util');
 const commonConfig = require('../tools/common-config');
 
-// Start the resource server only for implicit flow
-if (process.env.TEST_TYPE === 'implicit') {
-
-} else {
-    module.exports.config = commonConfig.configure(Promise.all([
-        daemonUtil.startResourceServer()
-    ]));
-}
+module.exports.config = commonConfig.configure(Promise.all([
+    daemonUtil.startResourceServer()
+]));
