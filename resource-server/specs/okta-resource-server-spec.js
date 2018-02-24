@@ -11,14 +11,17 @@
  */
 
 'use strict';
-const commonUtils = require('../../tools/common-util');
+const commonUtils = require('../../e2e-tests/tools/common-util/index');
+const daemonUtil = require('../../e2e-tests/tools/daemon-util/index');
 const request = require('request');
 
 describe('Okta Resource Server',  () => {
-  const appRoot = `http://localhost:${browser.params.appPort}`;
+  const appRoot = `http://localhost:${process.env.PORT || 8080}`;
 
 
   beforeAll(async () => {
+    daemonUtil.startResourceServer();
+
     this.accessToken = await commonUtils.getAccessToken({
       ISSUER: process.env.ISSUER,
       CLIENT_ID: process.env.CLIENT_ID,
@@ -26,10 +29,6 @@ describe('Okta Resource Server',  () => {
       USERNAME: process.env.USERNAME,
       PASSWORD: process.env.PASSWORD
     });
-  });
-
-  beforeEach( () => {
-    browser.ignoreSynchronization = true;
   });
 
   it('requires an access token to get the /api/messages data', (done) => {
