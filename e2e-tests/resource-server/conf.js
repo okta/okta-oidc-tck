@@ -15,5 +15,5 @@ const daemonUtil = require('../tools/daemon-util');
 const commonConfig = require('../tools/common-config');
 
 module.exports.config = commonConfig.configure(Promise.all([
-    daemonUtil.startResourceServer()
+  daemonUtil.startResourceServer()
 ]));
