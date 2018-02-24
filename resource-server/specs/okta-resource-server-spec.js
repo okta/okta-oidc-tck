@@ -16,7 +16,7 @@ const daemonUtil = require('../../e2e-tests/tools/daemon-util/index');
 const request = require('request');
 
 describe('Okta Resource Server',  () => {
-  const appRoot = `http://localhost:${process.env.PORT || 8080}`;
+  const appRoot = `http://localhost:${process.env.PORT || 8000}`;
 
 
   beforeAll(async () => {
