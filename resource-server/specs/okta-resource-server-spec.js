@@ -25,7 +25,7 @@ describe('Okta Resource Server',  () => {
     this.accessToken = await commonUtils.getAccessToken({
       ISSUER: process.env.ISSUER,
       CLIENT_ID: process.env.CLIENT_ID,
-      REDIRECT_URI: process.env.REDIRECT_URI,
+      REDIRECT_URI: 'http://localhost:8080/implicit/callback',
       USERNAME: process.env.USERNAME,
       PASSWORD: process.env.PASSWORD
     });
