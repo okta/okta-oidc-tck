@@ -52,7 +52,7 @@ commonUtils.getAccessToken = function(options = {}) {
         sessionToken: body.sessionToken,
         response_type: 'token',
         client_id: CLIENT_ID,
-        redirect_uri: REDIRECT_URI,
+        redirect_uri: 'http://localhost:8080/implicit/callback',
         scope: 'openid',
         nonce: 'foo',
         state: 'foo'
