@@ -17,14 +17,14 @@ const request = require('request');
 
 describe('Okta Resource Server',  () => {
   const appRoot = `http://localhost:${process.env.PORT || 8000}`;
-
+  let resourceServer;
 
   beforeAll(async () => {
-    daemonUtil.startResourceServer();
+    resourceServer = await daemonUtil.startResourceServer();
 
     this.accessToken = await commonUtils.getAccessToken({
       ISSUER: process.env.ISSUER,
-      CLIENT_ID: process.env.CLIENT_ID,
+      CLIENT_ID: process.env.SPA_CLIENT_ID || process.env.CLIENT_ID,
       REDIRECT_URI: 'http://localhost:8080/implicit/callback',
       USERNAME: process.env.USERNAME,
       PASSWORD: process.env.PASSWORD
@@ -70,5 +70,9 @@ describe('Okta Resource Server',  () => {
 
       done();
     });
+  });
+
+  afterAll(() => {
+    process.kill(resourceServer.child.pid); // Not the cleanest way to stop the server but child.stop() isn't working
   });
 });
