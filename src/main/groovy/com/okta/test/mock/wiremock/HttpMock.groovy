@@ -34,7 +34,7 @@ abstract class HttpMock {
 
     final private Logger logger = LoggerFactory.getLogger(HttpMock)
 
-    private WireMockServer wireMockServer
+    protected WireMockServer wireMockServer
     private int port
     private String scenario
 
