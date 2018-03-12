@@ -15,6 +15,8 @@
 const Monitor = require('forever-monitor').Monitor;
 const waitOn = require('wait-on');
 const chalk = require('chalk');
+const cmd = require('node-cmd');
+const platform = require('platform');
 
 const daemonUtil = module.exports;
 
@@ -23,6 +25,7 @@ function startNpmScript(script, color) {
     command: 'npm run',
     max: 1,
     silent: true,
+    spawnWith: {shell: true}
   });
 
   const normal = chalk[color || 'yellow'];
@@ -39,6 +42,15 @@ function startNpmScript(script, color) {
 
   child.on('exit', () => {
     console.log(normal(`Finished "npm run ${script}"`));
+    // This is needed to kill the node server process on windows which is not automatically killed
+    if(platform.os.family === 'Win32') {
+      cmd.get(
+        'TASKKILL /F /IM node.exe',
+        function(err, data, stderr) {
+            console.log(err)
+        }
+      );
+    }
   });
 
   return new Promise((resolve, reject) => {

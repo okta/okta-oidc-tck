@@ -25,7 +25,9 @@ The protractor tests have the following dependencies -
 
 ```bash
 "forever-monitor": "^1.7.1",
+"node-cmd": "^3.0.0",
 "jasmine-reporters": "^2.2.0",
+"platform": "^1.3.5",
 "protractor": "^5.1.0",
 "wait-on": "^2.0.2"
 ```
@@ -39,4 +41,3 @@ protractor okta-oidc-tck/e2e-tests/okta-hosted-login/conf.js
 ```
 
 The sample apps are expected to clone this tck repo locally to invoke the tests.
-
