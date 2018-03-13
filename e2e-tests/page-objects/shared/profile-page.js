@@ -18,6 +18,13 @@ class ProfilePage {
 
   constructor() {
     this.$emailClaim = $('#claim-email');
+    this.$familyNameClaim = $('#claim-family_name');
+    this.$givenNameClaim = $('#claim-given_name');
+    this.$localeClaim = $('#claim-locale');
+    this.$nameClaim = $('#claim-name');
+    this.$preferredUsernameClaim = $('#claim-preferred_username');
+    this.$subClaim = $('#claim-sub');
+    this.$zoneInfoClaim = $('#claim-zoneinfo');
   }
 
   waitForPageLoad() {
@@ -30,6 +37,34 @@ class ProfilePage {
 
   getEmailClaim() {
     return this.$emailClaim.getText();
+  }
+
+  getFamilyNameClaim() {
+    return this.$familyNameClaim.getText();
+  }
+
+  getGivenNameClaim() {
+    return this.$givenNameClaim.getText();
+  }
+
+  getLocaleClaim() {
+    return this.$localeClaim.getText();
+  }
+
+  getNameClaim() {
+    return this.$nameClaim.getText();
+  }
+
+  getPreferredUsernameClaim() {
+    return this.$preferredUsernameClaim.getText();
+  }
+
+  getSubClaim() {
+    return this.$subClaim.getText();
+  }
+
+  getZoneInfoClaim() {
+    return this.$zoneInfoClaim.getText();
   }
 }
 

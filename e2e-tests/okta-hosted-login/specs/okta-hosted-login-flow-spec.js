@@ -49,6 +49,13 @@ describe('Okta Hosted Login Flow', () => {
     authenticatedHomePage.viewProfile();
     profile.waitForPageLoad();
     expect(profile.getEmailClaim()).toBe(browser.params.login.email);
+    expect(profile.getFamilyNameClaim()).not.toBe('');
+    expect(profile.getGivenNameClaim()).not.toBe('');
+    expect(profile.getLocaleClaim()).not.toBe('');
+    expect(profile.getNameClaim()).not.toBe('');
+    expect(profile.getPreferredUsernameClaim()).not.toBe('');
+    expect(profile.getSubClaim()).not.toBe('');
+    expect(profile.getZoneInfoClaim()).not.toBe('');
   });
 
   it('can access resource server messages after login', async () => {
