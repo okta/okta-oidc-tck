@@ -24,9 +24,10 @@ commonConfig.configure = function (promises) {
     // Note the USERNAME should be of the form "username@email.com"
     params: {
       login: {
-        username: process.env.USERNAME,
+        // In windows, USERNAME is a built-in env var, which we don't want to change
+        username: process.env.USER_NAME || process.env.USERNAME,
         password: process.env.PASSWORD,
-        email: process.env.USERNAME,
+        email: process.env.USER_NAME || process.env.USERNAME,
       },
       // App servers start on port 8080 but configurable using env var
       appPort: process.env.PORT || 8080,
