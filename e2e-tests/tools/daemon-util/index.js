@@ -47,7 +47,11 @@ function startNpmScript(script, color) {
       cmd.get(
         'TASKKILL /F /IM node.exe',
         function(err, data, stderr) {
-            console.log(err)
+          if (!err) {
+            console.log('Terminated the node processes...')
+          } else {
+            console.error(err);
+          }
         }
       );
     }
