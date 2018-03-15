@@ -24,6 +24,7 @@ This tests the E2E flow for authenticating requests (using access tokens issued 
 The protractor tests have the following npm dependencies -
 
 ```json
+"find-process": "^1.1.0",
 "forever-monitor": "^1.7.1",
 "node-cmd": "^3.0.0",
 "jasmine-reporters": "^2.2.0",

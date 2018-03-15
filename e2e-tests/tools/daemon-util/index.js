@@ -16,6 +16,7 @@ const Monitor = require('forever-monitor').Monitor;
 const waitOn = require('wait-on');
 const chalk = require('chalk');
 const cmd = require('node-cmd');
+const find = require('find-process');
 const platform = require('platform');
 
 const daemonUtil = module.exports;
@@ -42,19 +43,29 @@ function startNpmScript(script, color) {
 
   child.on('exit', () => {
     console.log(normal(`Finished "npm run ${script}"`));
-    // This is needed to kill the node server process on windows which is not automatically killed
-    if(platform.os.family === 'Win32') {
-      cmd.get(
-        'TASKKILL /F /IM node.exe',
-        function(err, data, stderr) {
-          if (!err) {
-            console.log('Terminated the node processes...')
-          } else {
-            console.error(err);
+
+    if(platform.os.family !== 'Win32')
+      return;
+
+    // On windows the child process on 8080 isn't killed automatically
+    find('port', 8080)
+    .then(function (list) {
+      if (!list.length) {
+        console.log('port 8080 is free now');
+      } else {
+        console.log('%s is listening port 8080', list[0].pid);
+        cmd.get(
+          `TASKKILL /F /PID ${list[0].pid}`,
+          function(err, data, stderr) {
+            if (!err) {
+              console.log('Terminated the node process on port 8080.')
+            } else {
+              console.error(err);
+            }
           }
-        }
-      );
-    }
+        );
+      }
+    })
   });
 
   return new Promise((resolve, reject) => {
