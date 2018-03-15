@@ -47,25 +47,11 @@ function startNpmScript(script, color) {
     if(platform.os.family !== 'Win32')
       return;
 
-    // On windows the child process on 8080 isn't killed automatically
-    find('port', 8080)
-    .then(function (list) {
-      if (!list.length) {
-        console.log('port 8080 is free now');
-      } else {
-        console.log('%s is listening port 8080', list[0].pid);
-        cmd.get(
-          `TASKKILL /F /PID ${list[0].pid}`,
-          function(err, data, stderr) {
-            if (!err) {
-              console.log('Terminated the node process on port 8080.')
-            } else {
-              console.error(err);
-            }
-          }
-        );
-      }
-    })
+    // On windows the child processes aren't killed automatically
+    if (child.args[0].includes('resource-server'))
+      killProcessAtPort(8000);
+    else
+      killProcessAtPort(8080);
   });
 
   return new Promise((resolve, reject) => {
@@ -108,6 +94,25 @@ function startAndWait(opts) {
     resources: opts.resources,
   }, opts)
   .then(() => child));
+}
+
+function killProcessAtPort(port) {
+  find('port', port)
+  .then(function (list) {
+    if (list.length) {
+      console.log('%s is listening port %s', list[0].name, port);
+      cmd.get(
+        `TASKKILL /F /PID ${list[0].pid}`,
+        function(err, data, stderr) {
+          if (!err) {
+            console.log('Terminated the process on port %s', port)
+          } else {
+            console.error(err);
+          }
+        }
+      );
+    }
+  });
 }
 
 daemonUtil.startOktaHostedLoginServer = () => startAndWait({
