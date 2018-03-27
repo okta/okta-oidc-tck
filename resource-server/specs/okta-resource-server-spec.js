@@ -14,6 +14,10 @@
 const commonUtils = require('../../e2e-tests/tools/common-util/index');
 const daemonUtil = require('../../e2e-tests/tools/daemon-util/index');
 const request = require('request');
+const cmd = require('node-cmd');
+const find = require('find-process');
+const platform = require('platform');
+const { execSync } = require('child_process');
 
 describe('Okta Resource Server',  () => {
   const appRoot = `http://localhost:${process.env.PORT || 8000}`;
@@ -26,7 +30,7 @@ describe('Okta Resource Server',  () => {
       ISSUER: process.env.ISSUER,
       CLIENT_ID: process.env.SPA_CLIENT_ID || process.env.CLIENT_ID,
       REDIRECT_URI: 'http://localhost:8080/implicit/callback',
-      USERNAME: process.env.USER_NAME || process.env.USERNAME,
+      USERNAME: process.env.USERNAME,
       PASSWORD: process.env.PASSWORD
     });
   });
@@ -72,7 +76,16 @@ describe('Okta Resource Server',  () => {
     });
   });
 
-  afterAll(() => {
-    process.kill(resourceServer.child.pid); // Not the cleanest way to stop the server but child.stop() isn't working
+  afterAll(async () => {
+    const list = await find('port', 8000);
+
+    if (list.length) {
+      console.log('%s is listening port 8000', list[0].name);
+      if(platform.os.family !== 'Win32') {
+        execSync(`kill -9 ${list[0].pid}`);
+      } else {
+        execSync(`TASKKILL /F /PID ${list[0].pid}`);
+      }
+    }
   });
 });
