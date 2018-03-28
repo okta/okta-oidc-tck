@@ -14,7 +14,6 @@
 const commonUtils = require('../../e2e-tests/tools/common-util/index');
 const daemonUtil = require('../../e2e-tests/tools/daemon-util/index');
 const request = require('request');
-const cmd = require('node-cmd');
 const find = require('find-process');
 const platform = require('platform');
 const { execSync } = require('child_process');
