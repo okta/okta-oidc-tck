@@ -18,6 +18,7 @@ const chalk = require('chalk');
 const cmd = require('node-cmd');
 const find = require('find-process');
 const platform = require('platform');
+const { execSync } = require('child_process');
 
 const daemonUtil = module.exports;
 
@@ -96,23 +97,14 @@ function startAndWait(opts) {
   .then(() => child));
 }
 
-function killProcessAtPort(port) {
-  find('port', port)
-  .then(function (list) {
-    if (list.length) {
-      console.log('%s is listening port %s', list[0].name, port);
-      cmd.get(
-        `TASKKILL /F /PID ${list[0].pid}`,
-        function(err, data, stderr) {
-          if (!err) {
-            console.log('Terminated the process on port %s', port)
-          } else {
-            console.error(err);
-          }
-        }
-      );
-    }
-  });
+async function killProcessAtPort(port) {
+  const list = await find('port', port);
+
+  if (list.length) {
+    console.log('%s is listening port %s', list[0].name, port);
+    execSync(`TASKKILL /F /PID ${list[0].pid}`);
+    console.log('Terminated the process on port %s', port);
+  }
 }
 
 daemonUtil.startOktaHostedLoginServer = () => startAndWait({
