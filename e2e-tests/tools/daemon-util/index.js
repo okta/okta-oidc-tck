@@ -15,7 +15,6 @@
 const Monitor = require('forever-monitor').Monitor;
 const waitOn = require('wait-on');
 const chalk = require('chalk');
-const cmd = require('node-cmd');
 const find = require('find-process');
 const platform = require('platform');
 const { execSync } = require('child_process');
