@@ -11,6 +11,9 @@
  */
 
 'use strict';
+const path = require('path');
+// Env vars on new lines in the form of NAME=VALUE in testenv file at root of project
+require('dotenv').config({path: path.join(__dirname, '..', '..', '..', 'testenv')});
 const commonUtils = require('../../e2e-tests/tools/common-util/index');
 const daemonUtil = require('../../e2e-tests/tools/daemon-util/index');
 const request = require('request');

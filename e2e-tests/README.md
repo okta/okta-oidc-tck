@@ -24,6 +24,7 @@ This tests the E2E flow for authenticating requests (using access tokens issued 
 The protractor tests have the following npm dependencies -
 
 ```json
+"dotenv": "^5.0.1",
 "find-process": "^1.1.0",
 "forever-monitor": "^1.7.1",
 "jasmine-reporters": "^2.2.0",
@@ -32,10 +33,11 @@ The protractor tests have the following npm dependencies -
 "wait-on": "^2.0.2"
 ```
 Depending on the sample app & scenario you're testing you will need to set the following environment variables:
-- ISSUER
-- CLIENT_ID
-- USERNAME (USER_NAME for Windows)
-- PASSWORD
+- `ISSUER`
+- `CLIENT_ID`
+- `CLIENT_SECRET`
+- `USERNAME` (USER_NAME for Windows)
+- `PASSWORD`
 
 The sub-directories for each scenario contain a protractor configuration file (conf.js) which runs the specs for each scenario.
 
