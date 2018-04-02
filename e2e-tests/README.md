@@ -39,6 +39,8 @@ Depending on the sample app & scenario you're testing you will need to set the f
 - `USERNAME` (USER_NAME for Windows)
 - `PASSWORD`
 
+> **NOTE:** Instead of setting the above environment variables, you can create a file called `testenv` at the root of your project, and add them on new lines in the form of NAME=VALUE.
+
 The sub-directories for each scenario contain a protractor configuration file (conf.js) which runs the specs for each scenario.
 
 E.g To run the Okta-Hosted Login tests, run the following command
