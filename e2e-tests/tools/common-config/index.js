@@ -16,7 +16,10 @@
 /* global jasmine */
 const path = require('path');
 // Env vars on new lines in the form of NAME=VALUE in testenv file at root of project
-require('dotenv').config({path: path.join(__dirname, '..', '..', '..', '..', 'testenv')});
+const dotenv = require('dotenv');
+dotenv.config({path: path.join(require('os').homedir(), '.okta', 'testenv')});
+dotenv.config({path: path.join(__dirname, '..', '..', '..', '..', 'testenv')});
+
 const jasmineReporters = require('jasmine-reporters');
 
 const commonConfig = module.exports = {};
