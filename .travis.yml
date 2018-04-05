@@ -9,5 +9,7 @@ before_install:
 - source ./src/ci/before_install.sh
 script:
 - "./src/ci/build.sh"
+install:
+- "true"
 after_success:
   - bash <(curl -s https://codecov.io/bash) -f coverage/target/site/jacoco-aggregate/jacoco.xml
