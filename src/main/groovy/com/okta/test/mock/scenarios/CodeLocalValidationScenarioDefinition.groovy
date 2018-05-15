@@ -208,6 +208,17 @@ class CodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                         .withTransformer("gstring-template", "accessTokenJwt", wrongAudienceAccessTokenJwt)))
 
         wireMockServer.stubFor(
+                post(urlPathEqualTo("/oauth2/default/v1/token"))
+                        .withHeader("Authorization", equalTo(authHeader))
+                        .withRequestBody(containing("grant_type=authorization_code"))
+                        .withRequestBody(containing("code=TEST_CODE_invalidSignatureAccessTokenJwt&"))
+                        .withRequestBody(matching(".*"+Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" +Pattern.quote("%2Fauthorization-code%2Fcallback")  +".*"))
+                        .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json;charset=UTF-8")
+                        .withBodyFile("token.json")
+                        .withTransformer("gstring-template", "accessTokenJwt", invalidSignatureAccessTokenJwt)))
+
+        wireMockServer.stubFor(
                 get(urlPathEqualTo("/oauth2/default/v1/keys"))
                         .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json;charset=UTF-8")
