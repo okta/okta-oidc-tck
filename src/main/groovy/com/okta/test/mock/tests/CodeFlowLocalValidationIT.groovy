@@ -17,8 +17,10 @@ package com.okta.test.mock.tests
 
 import com.okta.test.mock.Scenario
 import com.okta.test.mock.application.ApplicationTestRunner
+import io.restassured.builder.ResponseSpecBuilder
 import io.restassured.http.ContentType
 import io.restassured.response.ExtractableResponse
+import io.restassured.specification.ResponseSpecification
 import org.hamcrest.Matcher
 import org.hamcrest.Matchers
 import org.testng.annotations.Test
@@ -134,7 +136,7 @@ class CodeFlowLocalValidationIT extends ApplicationTestRunner {
         .when()
             .get(requestUrl)
         .then()
-            .statusCode(401)
+            .spec(statusCodeMatcher(401))
         .extract()
     }
 
@@ -145,7 +147,7 @@ class CodeFlowLocalValidationIT extends ApplicationTestRunner {
         String state = redirectUrl.substring(redirectUrl.lastIndexOf('=')+1)
         String requestUrl = "http://localhost:${applicationPort}/authorization-code/callback?state=${state}"
 
-        ExtractableResponse response2 = given()
+        given()
             .accept(ContentType.JSON)
             .cookies(response.cookies())
             .redirects()
@@ -153,8 +155,7 @@ class CodeFlowLocalValidationIT extends ApplicationTestRunner {
         .when()
             .get(requestUrl)
         .then()
-            .statusCode(500)
-        .extract()
+            .spec(statusCodeMatcher(500))
     }
 
     @Test
@@ -173,7 +174,7 @@ class CodeFlowLocalValidationIT extends ApplicationTestRunner {
         .when()
             .get(requestUrl)
         .then()
-            .statusCode(401)
+            .spec(statusCodeMatcher(401))
     }
 
     @Test
@@ -192,7 +193,7 @@ class CodeFlowLocalValidationIT extends ApplicationTestRunner {
         .when()
             .get(requestUrl)
         .then()
-            .statusCode(401)
+            .spec(statusCodeMatcher(401))
     }
 
     @Test (enabled = false)
@@ -223,7 +224,7 @@ class CodeFlowLocalValidationIT extends ApplicationTestRunner {
         .when()
             .get("http://localhost:${applicationPort}/")
         .then().log().everything()
-            .statusCode(403)
+            .spec(statusCodeMatcher(403))
     }
 
     @Test
@@ -242,10 +243,27 @@ class CodeFlowLocalValidationIT extends ApplicationTestRunner {
         .when()
             .get(requestUrl)
         .then()
-            .statusCode(401)
+            .spec(statusCodeMatcher(401))
     }
 
     protected Matcher<?> loginPageMatcher() {
         return Matchers.equalTo("<html>fake_login_page<html/>")
+    }
+
+    private shouldErrorsRedirectToLogin() {
+        return Boolean.getBoolean("okta.tck.redirectOnError") || System.getenv().getOrDefault("OKTA_TCK_REDIRECT_ON_ERROR", "false").toBoolean()
+    }
+
+    protected ResponseSpecification statusCodeMatcher(int statusCode) {
+        if (shouldErrorsRedirectToLogin()) {
+            return new ResponseSpecBuilder()
+                    .expectStatusCode(302)
+                    .expectHeader("Location", is("http://localhost:${applicationPort}/authorization-code/callback".toString()))
+                    .build()
+        } else {
+            return new ResponseSpecBuilder()
+                    .expectStatusCode(statusCode)
+                    .build()
+        }
     }
 }
