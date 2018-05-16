@@ -26,7 +26,7 @@ TAG_NAME="okta-oidc-tck-${NEW_VERSION}" # default release plugin tag format
 
 # TODO: we must use our local maven settings file as this script is NOT ready for triggered by travis
 # GPG agent configuration needed to sign artifacts
-MVN_CMD="mvn"
+MVN_CMD="./mvnw"
 
 # Update pom versions, tag, update to new dev version
 ${MVN_CMD} release:prepare --batch-mode
@@ -35,7 +35,7 @@ ${MVN_CMD} release:prepare --batch-mode
 ${MVN_CMD} release:perform
 
 # the release plugin does not create signed tags, so update the existing tag
-git tag ${TAG_NAME} -f -s -m "${TAG_NAME}"
+git tag ${TAG_NAME} -f -s -m "${TAG_NAME}" ${TAG_NAME}
 
 echo
 echo "Tag '${TAG_NAME}' has been created"
