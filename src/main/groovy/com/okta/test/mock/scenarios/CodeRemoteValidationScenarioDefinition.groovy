@@ -41,10 +41,11 @@ class CodeRemoteValidationScenarioDefinition implements ScenarioDefinition {
                         .willReturn(aResponse()
                         .withBody("<html>fake_login_page<html/>")))
 
+        // remote access token
         wireMockServer.stubFor(
                 post(urlPathEqualTo("/oauth2/default/v1/token"))
                         .withRequestBody(containing("grant_type=authorization_code"))
-                        .withRequestBody(containing("code=TEST_CODE"))
+                        .withRequestBody(containing("code=TEST_CODE&"))
                         .withRequestBody(matching(".*" + Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" + Pattern.quote("%2Fauthorization-code%2Fcallback") + ".*"))
                         .withBasicAuth("OOICU812", "VERY_SECRET")
                         .willReturn(aResponse()
@@ -53,9 +54,27 @@ class CodeRemoteValidationScenarioDefinition implements ScenarioDefinition {
 
         wireMockServer.stubFor(
                 get(urlPathEqualTo("/oauth2/default/v1/userinfo"))
-                        .withHeader("Authorization", containing("Bearer accessTokenJwt"))
+                        .withHeader("Authorization", equalTo("Bearer accessTokenJwt"))
                         .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json;charset=UTF-8")
                         .withBodyFile("userinfo.json")))
+
+        // access token with groups
+        wireMockServer.stubFor(
+                post(urlPathEqualTo("/oauth2/default/v1/token"))
+                        .withRequestBody(containing("grant_type=authorization_code"))
+                        .withRequestBody(containing("code=TEST_CODE_WITH_GROUPS&"))
+                        .withRequestBody(matching(".*" + Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" + Pattern.quote("%2Fauthorization-code%2Fcallback") + ".*"))
+                        .withBasicAuth("OOICU812", "VERY_SECRET")
+                        .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json;charset=UTF-8")
+                        .withBodyFile("remote-validation-token-groups.json")))
+
+        wireMockServer.stubFor(
+                get(urlPathEqualTo("/oauth2/default/v1/userinfo"))
+                        .withHeader("Authorization", equalTo("Bearer accessTokenJwt_groups"))
+                        .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json;charset=UTF-8")
+                        .withBodyFile("userinfo-groups.json")))
     }
 }
