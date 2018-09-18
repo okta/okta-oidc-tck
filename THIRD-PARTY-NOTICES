@@ -13,48 +13,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 This project includes:
-  ANTLR 4 Runtime under The BSD License
   Apache Commons Codec under The Apache Software License, Version 2.0
-  Apache Commons Collections under Apache License, Version 2.0
   Apache Commons Lang under Apache License, Version 2.0
   Apache Groovy under The Apache Software License, Version 2.0
   Apache HttpClient under Apache License, Version 2.0
   Apache HttpClient Mime under Apache License, Version 2.0
   Apache HttpCore under Apache License, Version 2.0
-  ASM based accessors helper used by json-smart under The Apache Software License, Version 2.0
-  ASM Core under BSD
-  Guava: Google Core Libraries for Java under The Apache Software License, Version 2.0
   Hamcrest Core under New BSD License
   Hamcrest library under New BSD License
-  Handlebars under The Apache Software License, Version 2.0
   Jackson-annotations under The Apache Software License, Version 2.0
   Jackson-core under The Apache Software License, Version 2.0
   jackson-databind under The Apache Software License, Version 2.0
   Java Hamcrest under BSD Licence 3
-  Java Servlet API under CDDL + GPLv2 with classpath exception
   JCL 1.2 implemented over SLF4J under MIT License
   JCommander under The Apache Software License, Version 2.0
-  Jetty :: Continuation under Apache Software License - Version 2.0 or Eclipse Public License - Version 1.0
-  Jetty :: Http Utility under Apache Software License - Version 2.0 or Eclipse Public License - Version 1.0
-  Jetty :: IO Utility under Apache Software License - Version 2.0 or Eclipse Public License - Version 1.0
-  Jetty :: Security under Apache Software License - Version 2.0 or Eclipse Public License - Version 1.0
-  Jetty :: Server Core under Apache Software License - Version 2.0 or Eclipse Public License - Version 1.0
-  Jetty :: Servlet Handling under Apache Software License - Version 2.0 or Eclipse Public License - Version 1.0
-  Jetty :: Utilities under Apache Software License - Version 2.0 or Eclipse Public License - Version 1.0
-  Jetty :: Utility Servlets and Filters under Apache Software License - Version 2.0 or Eclipse Public License - Version 1.0
-  Jetty :: Webapp Application Support under Apache Software License - Version 2.0 or Eclipse Public License - Version 1.0
-  Jetty :: XML utilities under Apache Software License - Version 2.0 or Eclipse Public License - Version 1.0
-  JOpt Simple under The MIT License
-  JSON Small and Fast Parser under The Apache Software License, Version 2.0
   JSON Web Token support for the JVM under Apache License, Version 2.0
   json-path under Apache 2.0
-  JUnit under Eclipse Public License 1.0
   Logback Classic Module under Eclipse Public License - v 1.0 or GNU Lesser General Public License
   Logback Core Module under Eclipse Public License - v 1.0 or GNU Lesser General Public License
   Okta OIDC TCK under The Apache License, Version 2.0
-  org.xmlunit:xmlunit-core under The Apache Software License, Version 2.0
-  org.xmlunit:xmlunit-legacy under The BSD 3-Clause License
-  project ':json-path' under The Apache Software License, Version 2.0
   REST Assured under Apache 2.0
   rest-assured-common under Apache 2.0
   SLF4J API Module under MIT License
@@ -63,5 +40,4 @@ This project includes:
   testng under Apache  Version 2.0, January 2004
   WireMock under The Apache Software License, Version 2.0
   xml-path under Apache 2.0
-  zjsonpatch under The Apache Software License, Version 2.0
 
