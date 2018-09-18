@@ -164,21 +164,21 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.1.0</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <shadedArtifactAttached>true</shadedArtifactAttached>
-                            <createDependencyReducedPom>false</createDependencyReducedPom>
-                        </configuration>
-                    </execution>
-                </executions>
+              <groupId>org.springframework.boot</groupId>
+              <artifactId>spring-boot-maven-plugin</artifactId>
+              <version>2.0.5.RELEASE</version>
+              <executions>
+                <execution>
+                  <goals>
+                    <goal>repackage</goal>
+                  </goals>
+                </execution>
+              </executions>
+              <configuration>
+                  <attach>true</attach>
+                  <classifier>shaded</classifier>
+                  <mainClass>org.testng.TestNG</mainClass>
+              </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
