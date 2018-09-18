@@ -20,12 +20,11 @@ import com.okta.test.mock.Scenario
 import com.okta.test.mock.TestScenario
 import com.okta.test.mock.wiremock.HttpMock
 import groovy.text.StreamingTemplateEngine
-import org.junit.Assert
+import org.testng.Assert
 import org.testng.annotations.AfterClass
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.BeforeMethod
 import org.testng.SkipException
-import org.testng.util.Strings
 import org.yaml.snakeyaml.Yaml
 
 import java.lang.reflect.Method
@@ -39,6 +38,7 @@ abstract class ApplicationTestRunner extends HttpMock {
     private ApplicationUnderTest app = getApplicationUnderTest(getScenarioName())
 
     private int mockPort
+    private int mockHttpsPort
     private int applicationPort
     private TestScenario scenario
 
@@ -60,6 +60,10 @@ abstract class ApplicationTestRunner extends HttpMock {
 
     int doGetMockPort() {
         return mockPort
+    }
+
+    int doGetMockHttpsPort() {
+        return mockHttpsPort
     }
 
     String getLoginRedirectPath() {
@@ -142,10 +146,11 @@ abstract class ApplicationTestRunner extends HttpMock {
         // figure out which ports we need
         applicationPort = getPort("applicationPort", scenario)
         mockPort = getPort("mockPort", scenario)
+        mockHttpsPort = getPort("mockHttpsPort", scenario)
 
         // interpolate the scenario args with the ports
         def templateEngine = new StreamingTemplateEngine()
-        def binding = [applicationPort: applicationPort, mockPort: mockPort]
+        def binding = [applicationPort: applicationPort, mockPort: mockPort, mockHttpsPort: mockHttpsPort]
         List<String> filteredArgs = scenario.args.stream()
             .map { templateEngine.createTemplate(it).make(binding).toString() }
             .collect(Collectors.toList())

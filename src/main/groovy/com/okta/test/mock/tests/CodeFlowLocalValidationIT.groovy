@@ -59,7 +59,7 @@ class CodeFlowLocalValidationIT extends ApplicationTestRunner {
     @Test
     ExtractableResponse redirectToRemoteLogin() {
         String expectedRedirect = Pattern.quote(
-                "http://localhost:${doGetMockPort()}/oauth2/default/v1/authorize" +
+                "${baseUrl}/oauth2/default/v1/authorize" +
                 "?client_id=OOICU812" +
                 "&redirect_uri=http://localhost:${applicationPort}/authorization-code/callback" +
                 "&response_type=code" +
