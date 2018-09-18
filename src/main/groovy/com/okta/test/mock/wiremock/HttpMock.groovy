@@ -16,6 +16,7 @@
 package com.okta.test.mock.wiremock
 
 import com.github.tomakehurst.wiremock.WireMockServer
+import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.common.ClasspathFileSource
 import com.github.tomakehurst.wiremock.common.FileSource
 import com.github.tomakehurst.wiremock.extension.Parameters
@@ -28,6 +29,16 @@ import groovy.text.StreamingTemplateEngine
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.testng.annotations.AfterClass
+import wiremock.com.google.common.io.Resources
+
+import java.nio.file.CopyOption
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
+import java.security.KeyPair
+import java.security.KeyStore
+import java.security.cert.X509Certificate
+
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 
 abstract class HttpMock {
@@ -36,6 +47,7 @@ abstract class HttpMock {
 
     protected WireMockServer wireMockServer
     private int port
+    private int httpsPort
     private String scenario
 
     void setScenario(String scenario) {
@@ -51,17 +63,33 @@ abstract class HttpMock {
     void startMockServer() {
         if (wireMockServer == null) {
 
-            ScenarioDefinition definition =  Scenario.fromId(scenario).definition
-            Map bindingMap = baseBindingMap + definition.bindingMap
+            def keyStorePassword = "password"
 
-            wireMockServer = new WireMockServer(wireMockConfig()
-                    .port(getMockPort())
-                    .fileSource(new ClasspathFileSource("stubs"))
-                    .extensions(new GStringTransformer(bindingMap))
-            )
+            try {
+                def outKeyStoreFile = File.createTempFile("testing-keystore", "jks").toPath()
+                Files.copy(ClassLoader.getSystemResource("tck-keystore.jks").openStream(), outKeyStoreFile, StandardCopyOption.REPLACE_EXISTING)
+                def keyStorePath = outKeyStoreFile.toFile().absolutePath
+                System.setProperty("javax.net.ssl.trustStore", keyStorePath)
 
-            definition.configureHttpMock(wireMockServer)
-            wireMockServer.start()
+                ScenarioDefinition definition =  Scenario.fromId(scenario).definition
+                Map bindingMap = baseBindingMap + definition.bindingMap
+                wireMockServer = new WireMockServer(wireMockConfig()
+                        .port(getMockPort())
+                        .httpsPort(getMockHttpsPort())
+                        .keystorePath(keyStorePath)
+                        .keystorePassword(keyStorePassword)
+                        .fileSource(new ClasspathFileSource("stubs"))
+                        .extensions(new GStringTransformer(bindingMap))
+                )
+
+                definition.configureHttpMock(wireMockServer)
+                wireMockServer.start()
+                WireMock.configureFor("https", "localhost", wireMockServer.httpsPort())
+
+            } catch (e) {
+                e.printStackTrace()
+                throw e
+            }
         }
     }
 
@@ -70,6 +98,13 @@ abstract class HttpMock {
         if (wireMockServer != null) {
             wireMockServer.stop()
         }
+    }
+
+    int getMockHttpsPort() {
+        if (httpsPort == 0) {
+            httpsPort = doGetMockHttpsPort()
+        }
+        return httpsPort
     }
 
     int getMockPort() {
@@ -81,8 +116,10 @@ abstract class HttpMock {
 
     abstract int doGetMockPort()
 
+    abstract int doGetMockHttpsPort()
+
     String getBaseUrl() {
-        return "http://localhost:${getMockPort()}"
+        return "https://localhost:${getMockHttpsPort()}"
     }
 }
 
