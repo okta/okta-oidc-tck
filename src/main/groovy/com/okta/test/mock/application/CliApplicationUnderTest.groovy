@@ -34,10 +34,15 @@ class CliApplicationUnderTest implements ApplicationUnderTest {
         File logFile = new File("target", "${testScenario.command}-${new Date().format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone("UTC"))}" )
         logger.info("Starting process: ${command}, logging to file: ${logFile}")
 
-        process = new ProcessBuilder(command)
+        def processBuilder = new ProcessBuilder(command)
             .redirectErrorStream(true)
             .redirectOutput(logFile)
-            .start()
+
+        // add any new env vars
+        processBuilder.environment().putAll(testScenario.env)
+
+        // start the application
+        process = processBuilder.start()
 
         if (process.waitFor(5, TimeUnit.SECONDS)) {
             Assert.fail("Process did not start: ${testScenario.command}: exit status: ${process.exitValue()}")

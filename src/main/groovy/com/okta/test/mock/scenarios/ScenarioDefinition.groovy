@@ -23,5 +23,5 @@ trait ScenarioDefinition {
         return Collections.emptyMap()
     }
 
-    abstract void configureHttpMock(WireMockServer wireMockServer)
+    abstract void configureHttpMock(WireMockServer wireMockServer, String baseUrl)
 }
