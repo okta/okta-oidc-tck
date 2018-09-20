@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 package com.okta.test.mock.scenarios
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 enum Scenario {
     CODE_FLOW_LOCAL_VALIDATION("code-flow-local-validation", new CodeLocalValidationScenarioDefinition()),

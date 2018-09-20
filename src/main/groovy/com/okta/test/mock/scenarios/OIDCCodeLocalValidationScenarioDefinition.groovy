@@ -33,10 +33,11 @@ import static com.github.tomakehurst.wiremock.client.WireMock.get
 import static com.github.tomakehurst.wiremock.client.WireMock.matching
 import static com.github.tomakehurst.wiremock.client.WireMock.post
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
-import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo
 
 class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
 
+    final Map<String, String> bindingMap = new HashMap<>()
     String pubKeyE
     String pubKeyN
     String accessTokenJwt
@@ -53,7 +54,12 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
     String clientSecret = "VERY_SECRET"
     String authHeader = "Basic " + "${clientId}:${clientSecret}".bytes.encodeBase64().toString()
 
-    OIDCCodeLocalValidationScenarioDefinition() {
+    Map getBindingMap() {
+        // late binding
+        return bindingMap
+    }
+
+    void configureBindings(String issuerUrl) {
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA")
         keyPairGenerator.initialize(4096)
         KeyPair invalidKeyPair = keyPairGenerator.generateKeyPair()
@@ -81,7 +87,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .claim("email", "joe.coder@example.com")
                 .claim("preferred_username", "jod.coder@example.com")
                 .setAudience("OOICU812")
-                .setIssuer("http://localhost:9090/oauth2/default")
+                .setIssuer(issuerUrl)
                 .setIssuedAt(Date.from(now))
                 .setNotBefore(Date.from(now))
                 .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
@@ -96,7 +102,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .claim("email", "joe.coder@example.com")
                 .claim("preferred_username", "jod.coder@example.com")
                 .setAudience("OOICU812")
-                .setIssuer("http://localhost:9090/oauth2/default")
+                .setIssuer(issuerUrl)
                 .setIssuedAt(Date.from(now))
                 .setNotBefore(Date.from(now))
                 .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
@@ -111,7 +117,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .claim("email", "joe.coder@example.com")
                 .claim("preferred_username", "jod.coder@example.com")
                 .setAudience("WRONG_OOICU812")
-                .setIssuer("http://localhost:9090/oauth2/default")
+                .setIssuer(issuerUrl)
                 .setIssuedAt(Date.from(now))
                 .setNotBefore(Date.from(now))
                 .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
@@ -126,7 +132,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .claim("email", "joe.coder@example.com")
                 .claim("preferred_username", "jod.coder@example.com")
                 .setAudience("OOICU812")
-                .setIssuer("http://localhost:9090/oauth2/default")
+                .setIssuer(issuerUrl)
                 .setIssuedAt(Date.from(now.plus(1, ChronoUnit.HOURS)))
                 .setNotBefore(Date.from(now))
                 .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
@@ -141,7 +147,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .claim("email", "joe.coder@example.com")
                 .claim("preferred_username", "jod.coder@example.com")
                 .setAudience("OOICU812")
-                .setIssuer("http://localhost:9090/oauth2/default")
+                .setIssuer(issuerUrl)
                 .setIssuedAt(Date.from(now))
                 .setNotBefore(Date.from(now))
                 .setExpiration(Date.from(now.minus(1, ChronoUnit.HOURS)))
@@ -156,7 +162,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .claim("email", "joe.coder@example.com")
                 .claim("preferred_username", "jod.coder@example.com")
                 .setAudience("OOICU812")
-                .setIssuer("http://localhost:9090/oauth2/default")
+                .setIssuer(issuerUrl)
                 .setIssuedAt(Date.from(now))
                 .setNotBefore(Date.from(now))
                 .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
@@ -171,7 +177,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .claim("email", "joe.coder@example.com")
                 .claim("preferred_username", "jod.coder@example.com")
                 .setAudience("OOICU812")
-                .setIssuer("http://localhost:9090/oauth2/default_INVALID")
+                .setIssuer("${issuerUrl}_INVALID")
                 .setIssuedAt(Date.from(now))
                 .setNotBefore(Date.from(now))
                 .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
@@ -186,7 +192,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .claim("email", "joe.coder@example.com")
                 .claim("preferred_username", "jod.coder@example.com")
                 .setAudience("OOICU812")
-                .setIssuer("http://localhost:9090/oauth2/default")
+                .setIssuer(issuerUrl)
                 .setIssuedAt(Date.from(now))
                 .setNotBefore(Date.from(now.plus(1, ChronoUnit.HOURS)))
                 .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
@@ -201,7 +207,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .claim("email", "joe.coder@example.com")
                 .claim("preferred_username", "jod.coder@example.com")
                 .setAudience("OOICU812")
-                .setIssuer("http://localhost:9090/oauth2/default")
+                .setIssuer(issuerUrl)
                 .setIssuedAt(Date.from(now))
                 .setNotBefore(Date.from(now))
                 .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
@@ -210,16 +216,18 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .compact()
     }
 
-    Map getBindingMap() {
-        return [
+    @Override
+    void configureHttpMock(WireMockServer wireMockServer, String baseUrl) {
+
+        configureBindings("${baseUrl}/oauth2/default")
+
+        bindingMap.putAll([
                 accessTokenJwt: accessTokenJwt,
                 pubKeyE: pubKeyE,
                 pubKeyN: pubKeyN,
                 idTokenJwt: idTokenJwt
-        ]
-    }
+        ])
 
-    void configureHttpMock(WireMockServer wireMockServer) {
         wireMockServer.stubFor(
                 get("/oauth2/default/.well-known/openid-configuration")
                         .willReturn(aResponse()

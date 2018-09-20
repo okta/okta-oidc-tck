@@ -25,6 +25,7 @@ class TestScenario {
     Boolean enabled
     String command
     String loginRedirectPath
+    Map<String, String> env = new HashMap<>()
     List<String> args = new ArrayList<>()
     Map<String, Integer> ports = new HashMap<>()
 }

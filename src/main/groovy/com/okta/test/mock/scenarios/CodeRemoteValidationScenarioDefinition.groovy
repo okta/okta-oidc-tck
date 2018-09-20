@@ -23,7 +23,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*
 
 class CodeRemoteValidationScenarioDefinition implements ScenarioDefinition {
 
-    void configureHttpMock(WireMockServer wireMockServer) {
+    @Override
+    void configureHttpMock(WireMockServer wireMockServer, String baseUrl) {
         wireMockServer.stubFor(
                 get("/oauth2/default/.well-known/openid-configuration")
                         .willReturn(aResponse()

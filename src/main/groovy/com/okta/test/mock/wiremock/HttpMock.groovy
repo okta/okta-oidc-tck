@@ -24,22 +24,16 @@ import com.github.tomakehurst.wiremock.extension.ResponseTransformer
 import com.github.tomakehurst.wiremock.http.Request
 import com.github.tomakehurst.wiremock.http.Response
 import com.okta.test.mock.scenarios.Scenario
-import com.okta.test.mock.scenarios.ScenarioDefinition
 import groovy.text.StreamingTemplateEngine
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.testng.annotations.AfterClass
-import wiremock.com.google.common.io.Resources
 
-import java.nio.file.CopyOption
 import java.nio.file.Files
-import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
-import java.security.KeyPair
-import java.security.KeyStore
-import java.security.cert.X509Certificate
 
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
+import static java.lang.Thread.currentThread
 
 abstract class HttpMock {
 
@@ -67,22 +61,28 @@ abstract class HttpMock {
 
             try {
                 def outKeyStoreFile = File.createTempFile("testing-keystore", "jks").toPath()
-                Files.copy(ClassLoader.getSystemResource("tck-keystore.jks").openStream(), outKeyStoreFile, StandardCopyOption.REPLACE_EXISTING)
+                def keyStoreResource = currentThread().contextClassLoader.getResource("tck-keystore.jks")
+                Files.copy(keyStoreResource.openStream(), outKeyStoreFile, StandardCopyOption.REPLACE_EXISTING)
                 def keyStorePath = outKeyStoreFile.toFile().absolutePath
                 System.setProperty("javax.net.ssl.trustStore", keyStorePath)
 
-                ScenarioDefinition definition =  Scenario.fromId(scenario).definition
-                Map bindingMap = baseBindingMap + definition.bindingMap
+                def definition = Scenario.fromId(scenario).definition
+
+                // WireMock has a bug when running with a more complex classloader (like a nested uber jar)
+                // to work around this we will just attempt to find a resource and check its path.
+                def stubsURL = currentThread().getContextClassLoader().getResource("stubs")
+                def stubsPath = stubsURL.toString().contains("BOOT-INF/classes") ? "BOOT-INF/classes/stubs" : "stubs"
+
                 wireMockServer = new WireMockServer(wireMockConfig()
                         .port(getMockPort())
                         .httpsPort(getMockHttpsPort())
                         .keystorePath(keyStorePath)
                         .keystorePassword(keyStorePassword)
-                        .fileSource(new ClasspathFileSource("stubs"))
-                        .extensions(new GStringTransformer(bindingMap))
+                        .fileSource(new ClasspathFileSource(stubsPath))
+                        .extensions(new GStringTransformer(definition.bindingMap, baseBindingMap))
                 )
 
-                definition.configureHttpMock(wireMockServer)
+                definition.configureHttpMock(wireMockServer, getBaseUrl())
                 wireMockServer.start()
                 WireMock.configureFor("https", "localhost", wireMockServer.httpsPort())
 
@@ -119,16 +119,18 @@ abstract class HttpMock {
     abstract int doGetMockHttpsPort()
 
     String getBaseUrl() {
-        return "https://localhost:${getMockHttpsPort()}"
+        return Boolean.getBoolean("okta.testing.disableHttpsCheck") \
+            ? "http://localhost:${getMockPort()}"
+            : "https://localhost:${getMockHttpsPort()}"
     }
 }
 
 class GStringTransformer extends ResponseTransformer {
 
-    private final Map binding
+    private final List<Map> bindings
 
-    GStringTransformer(Map binding) {
-        this.binding = binding
+    GStringTransformer(Map... bindings) {
+        this.bindings = bindings
     }
 
     @Override
@@ -138,7 +140,13 @@ class GStringTransformer extends ResponseTransformer {
 
     @Override
     Response transform(Request request, Response response, FileSource files, Parameters parameters) {
-        Map params = (parameters == null) ? binding : binding + parameters
+
+        Map params = new HashMap()
+        // merge bindings
+        bindings.forEach {params += it}
+        // override binds with params if any
+        if (parameters != null) params += parameters
+
         return Response.Builder
                 .like(response)
                 .body(new StreamingTemplateEngine().createTemplate(response.bodyAsString).make(params).toString())

@@ -34,7 +34,7 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
     @Test
     ExtractableResponse redirectToRemoteLogin() {
         String expectedRedirect = Pattern.quote(
-                "http://localhost:${doGetMockPort()}/oauth2/default/v1/authorize" +
+                "${baseUrl}/oauth2/default/v1/authorize" +
                 "?scope=profile%20email%20openid" +
                 "&response_type=code" +
                 "&redirect_uri=http%3A%2F%2Flocalhost%3A${applicationPort}%2Fauthorization-code%2Fcallback" +
