@@ -100,6 +100,11 @@ abstract class HttpMock {
         }
     }
 
+    /**
+     * Calls {@code doGetMockHttpsPort} and caches the result, allowing the implementation to NOT worry about the
+     * cache/init logic.
+     * @return the port the mock server will respond to over https
+     */
     int getMockHttpsPort() {
         if (httpsPort == 0) {
             httpsPort = doGetMockHttpsPort()
@@ -107,6 +112,11 @@ abstract class HttpMock {
         return httpsPort
     }
 
+    /**
+     * Calls {@code doGetMockPort()} and caches the result, allowing the implementation to NOT worry about the
+     * cache/init logic.
+     * @return the port the mock server will respond to over http
+     */
     int getMockPort() {
         if (port == 0) {
             port = doGetMockPort()
@@ -114,8 +124,18 @@ abstract class HttpMock {
         return port
     }
 
+    /**
+     * Called by {@code getMockPort()} to allow late init and caching of the actual returned value. Implementing classes
+     * may return a static or random port.
+     * @return the port the mock server will respond to over http
+     */
     abstract int doGetMockPort()
 
+    /**
+     * Called by {@code getMockHttpsPort()} to allow late init and caching of the actual returned value. Implementing classes
+     * may return a static or random port.
+     * @return the port the mock server will respond to over https
+     */
     abstract int doGetMockHttpsPort()
 
     String getBaseUrl() {
