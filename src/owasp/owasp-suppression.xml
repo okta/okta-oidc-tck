@@ -25,4 +25,15 @@
        <cve>CVE-2016-6497</cve>
     </suppress>
 
+    <suppress>
+        <notes><![CDATA[
+        wiremock-standalone contains an old repackaged version of Jetty which contains the
+        following CVEs, wiremock is pinned to this version. This repackaged Jetty is used for test structures ONLY
+        so we can safely ignore them ]]></notes>
+        <cve>CVE-2017-7656</cve>
+        <cve>CVE-2017-7657</cve>
+        <cve>CVE-2017-7658</cve>
+        <cve>CVE-2017-9735</cve>
+    </suppress>
+
 </suppressions>
