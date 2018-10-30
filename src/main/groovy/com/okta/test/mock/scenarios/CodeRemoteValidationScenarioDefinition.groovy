@@ -37,8 +37,8 @@ class CodeRemoteValidationScenarioDefinition implements ScenarioDefinition {
                         .withQueryParam("client_id", matching("OOICU812"))
                         .withQueryParam("redirect_uri", matching(Pattern.quote("http://localhost:") + "\\d+/authorization-code/callback"))
                         .withQueryParam("response_type", matching("code"))
-                        .withQueryParam("scope", matching("profile email openid"))
-                        .withQueryParam("state", matching(".{6}"))
+                        .withQueryParam("scope", matching("offline_access"))
+                        .withQueryParam("state", matching(".{6,}"))
                         .willReturn(aResponse()
                         .withBody("<html>fake_login_page<html/>")))
 
