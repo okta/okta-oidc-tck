@@ -35,15 +35,6 @@ import static com.okta.test.mock.scenarios.Scenario.CODE_FLOW_LOCAL_VALIDATION
 class CodeFlowLocalValidationIT extends ApplicationTestRunner {
     @Test
     void redirectToLogin() {
-        // Samples are updated to have a login button on home page
-        // Redirect to login occurs when user tries to access an unauthenticated page
-        // Now clients can set a path relative to home page that redirects to login
-        // System property "redirect.path" or scenario property "loginRedirectPath" can be used
-        String loginRedirectPath = System.getProperty("redirect.path");
-        if (loginRedirectPath == null) {
-            // Check if the login redirect path is set in the scenario properties
-            loginRedirectPath = getLoginRedirectPath()
-        }
 
         given()
             .redirects()
@@ -265,5 +256,10 @@ class CodeFlowLocalValidationIT extends ApplicationTestRunner {
                     .expectStatusCode(statusCode)
                     .build()
         }
+    }
+
+    @Override
+    String getLoginRedirectPath() {
+        return System.getProperty("redirect.path", super.getLoginRedirectPath())
     }
 }

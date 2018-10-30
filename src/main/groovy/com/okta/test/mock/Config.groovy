@@ -24,7 +24,7 @@ class TestScenario {
     List<String> disabledTests = new ArrayList<>()
     Boolean enabled
     String command
-    String loginRedirectPath
+    String loginRedirectPath = ""
     Map<String, String> env = new HashMap<>()
     List<String> args = new ArrayList<>()
     Map<String, Integer> ports = new HashMap<>()
