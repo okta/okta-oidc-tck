@@ -32,6 +32,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 
 class ImplicitLocalValidationScenarioDefinition implements ScenarioDefinition {
 
+    final Map<String, String> bindingMap = new HashMap<>()
     String pubKeyE
     String pubKeyN
     String accessTokenJwt
@@ -43,6 +44,15 @@ class ImplicitLocalValidationScenarioDefinition implements ScenarioDefinition {
     String idTokenjwt
 
     ImplicitLocalValidationScenarioDefinition() {
+    }
+
+    Map getBindingMap() {
+        // late binding
+        return bindingMap
+    }
+
+    private void configureTokens(String issuer) {
+
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA")
         keyPairGenerator.initialize(4096)
         KeyPair invalidKeyPair = keyPairGenerator.generateKeyPair()
@@ -52,10 +62,12 @@ class ImplicitLocalValidationScenarioDefinition implements ScenarioDefinition {
         pubKeyE = Base64.encodeBase64URLSafeString(TestUtils.toIntegerBytes(keyPair.publicKey.getPublicExponent()))
         pubKeyN = Base64.encodeBase64URLSafeString(TestUtils.toIntegerBytes(keyPair.publicKey.getModulus()))
 
+
         Instant now = Instant.now()
         accessTokenJwt =  Jwts.builder()
                 .setSubject("joe.coder@example.com")
                 .setAudience("api://default")
+                .setIssuer(issuer)
                 .claim("scp", ["profile", "openid", "email"])
                 .claim("groups", ["Everyone", "Test-Group"])
                 .setIssuedAt(Date.from(now))
@@ -69,6 +81,7 @@ class ImplicitLocalValidationScenarioDefinition implements ScenarioDefinition {
         inactiveAccessTokenJwt =  Jwts.builder()
                 .setSubject("joe.coder@example.com")
                 .setAudience("api://default")
+                .setIssuer(issuer)
                 .claim("scp", ["profile", "openid", "email"])
                 .claim("groups", ["Everyone", "Test-Group"])
                 .setIssuedAt(Date.from(now))
@@ -82,6 +95,7 @@ class ImplicitLocalValidationScenarioDefinition implements ScenarioDefinition {
         expiredAccessTokenJwt =  Jwts.builder()
                 .setSubject("joe.coder@example.com")
                 .setAudience("api://default")
+                .setIssuer(issuer)
                 .claim("scp", ["profile", "openid", "email"])
                 .claim("groups", ["Everyone", "Test-Group"])
                 .setIssuedAt(Date.from(now))
@@ -95,6 +109,7 @@ class ImplicitLocalValidationScenarioDefinition implements ScenarioDefinition {
         wrongScopeAccessTokenJwt =  Jwts.builder()
                 .setSubject("joe.coder@example.com")
                 .setAudience("api://default")
+                .setIssuer(issuer)
                 .claim("scp", ["profile", "openid"])
                 .claim("groups", ["Everyone", "Test-Group"])
                 .setIssuedAt(Date.from(now))
@@ -108,6 +123,7 @@ class ImplicitLocalValidationScenarioDefinition implements ScenarioDefinition {
         invalidAccessTokenJwt =  Jwts.builder()
                 .setSubject("joe.coder@example.com")
                 .setAudience("api://default")
+                .setIssuer(issuer)
                 .claim("scp", ["profile", "openid", "email"])
                 .claim("groups", ["Everyone", "Test-Group"])
                 .setIssuedAt(Date.from(now))
@@ -121,6 +137,7 @@ class ImplicitLocalValidationScenarioDefinition implements ScenarioDefinition {
         wrongAudienceAccessTokenJwt =  Jwts.builder()
                 .setSubject("joe.coder@example.com")
                 .setAudience("api://something-else")
+                .setIssuer(issuer)
                 .claim("scp", ["profile", "openid", "email"])
                 .claim("groups", ["Everyone", "Test-Group"])
                 .setIssuedAt(Date.from(now))
@@ -137,6 +154,7 @@ class ImplicitLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .claim("email", "joe.coder@example.com")
                 .claim("preferred_username", "jod.coder@example.com")
                 .setAudience("api://default")
+                .setIssuer(issuer)
                 .setIssuedAt(Date.from(now))
                 .setNotBefore(Date.from(now))
                 .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
@@ -144,19 +162,20 @@ class ImplicitLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .setKeyId('TEST_PUB_KEY_ID'))
                 .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
                 .compact()
-    }
 
-    Map getBindingMap() {
-        return [
+        bindingMap.putAll([
                 accessTokenJwt: accessTokenJwt,
                 pubKeyE: pubKeyE,
                 pubKeyN: pubKeyN,
                 idTokenjwt: idTokenjwt
-        ]
+        ])
     }
 
     @Override
     void configureHttpMock(WireMockServer wireMockServer, String baseUrl) {
+
+        configureTokens("${baseUrl}/oauth2/default")
+
         wireMockServer.stubFor(
                 get("/oauth2/default/.well-known/openid-configuration")
                         .willReturn(aResponse()
