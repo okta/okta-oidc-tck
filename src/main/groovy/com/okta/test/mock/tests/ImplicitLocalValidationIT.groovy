@@ -18,6 +18,7 @@ package com.okta.test.mock.tests
 import com.okta.test.mock.Scenario
 import com.okta.test.mock.application.ApplicationTestRunner
 import io.restassured.http.ContentType
+import org.hamcrest.Matcher
 import org.hamcrest.Matchers
 import org.testng.annotations.Test
 
@@ -38,7 +39,7 @@ class ImplicitLocalValidationIT extends ApplicationTestRunner {
             .get("http://localhost:${applicationPort}/api/messages")
         .then()
             .statusCode(401)
-            .header("WWW-Authenticate", startsWith("Bearer realm="))
+            .header("WWW-Authenticate", authenticateHeader())
     }
 
     @Test
@@ -51,7 +52,7 @@ class ImplicitLocalValidationIT extends ApplicationTestRunner {
             .get("http://localhost:${applicationPort}/api/messages")
         .then()
             .statusCode(401)
-            .header("WWW-Authenticate", startsWith("Bearer realm="))
+            .header("WWW-Authenticate", authenticateHeader())
     }
 
     @Test
@@ -64,7 +65,7 @@ class ImplicitLocalValidationIT extends ApplicationTestRunner {
             .get("http://localhost:${applicationPort}/api/messages")
         .then()
             .statusCode(401)
-            .header("WWW-Authenticate", startsWith("Bearer realm="))
+            .header("WWW-Authenticate", authenticateHeader())
     }
 
     @Test
@@ -77,7 +78,7 @@ class ImplicitLocalValidationIT extends ApplicationTestRunner {
             .get("http://localhost:${applicationPort}/api/messages")
         .then()
             .statusCode(401)
-            .header("WWW-Authenticate", startsWith("Bearer realm="))
+            .header("WWW-Authenticate", authenticateHeader())
     }
 
     @Test
@@ -115,5 +116,9 @@ class ImplicitLocalValidationIT extends ApplicationTestRunner {
             .get("http://localhost:${applicationPort}/api/messages")
         .then()
             .statusCode(401)
+    }
+
+    private Matcher authenticateHeader() {
+        return startsWith("Bearer")
     }
 }
