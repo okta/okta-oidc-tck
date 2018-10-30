@@ -91,7 +91,7 @@ class ImplicitLocalValidationIT extends ApplicationTestRunner {
             .get("http://localhost:${applicationPort}/api/messages")
         .then()
             .statusCode(200)
-            .body("messages.text", hasItems("I am a robot.", "Hello, word!"))
+            .body("messages.text", hasItems("I am a robot.", "Hello, world!"))
     }
 
     @Test
