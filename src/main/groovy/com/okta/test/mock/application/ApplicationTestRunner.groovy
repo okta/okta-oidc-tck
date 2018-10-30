@@ -21,6 +21,9 @@ import com.okta.test.mock.TestScenario
 import com.okta.test.mock.wiremock.HttpMock
 import groovy.text.StreamingTemplateEngine
 import org.testng.Assert
+import org.testng.IHookCallBack
+import org.testng.IHookable
+import org.testng.ITestResult
 import org.testng.annotations.AfterClass
 import org.testng.annotations.BeforeClass
 import org.testng.annotations.BeforeMethod
@@ -33,7 +36,7 @@ import java.util.stream.Collectors
 import static io.restassured.RestAssured.given
 import static org.hamcrest.MatcherAssert.assertThat
 
-abstract class ApplicationTestRunner extends HttpMock {
+abstract class ApplicationTestRunner extends HttpMock implements IHookable {
 
     private ApplicationUnderTest app = getApplicationUnderTest(getScenarioName())
 
@@ -70,23 +73,20 @@ abstract class ApplicationTestRunner extends HttpMock {
         return app.getTestScenario().loginRedirectPath
     }
 
-    @BeforeMethod
-    void checkToRun(Method method) {
-        if (scenario.enabled == false) {
-            throw new SkipException("Skipping the disabled scenario")
-        }
+    @Override
+    void run(IHookCallBack callBack, ITestResult testResult) {
 
-        for (String disabledTest : scenario.disabledTests) {
-            if (method.getName().equals(disabledTest)) {
-                throw new SkipException("Skipping the disabled test - " + disabledTest)
-            }
+        String testMethod = testResult.method.getMethodName()
+        if (scenario.enabled == false || scenario.disabledTests.contains(testMethod)) {
+            throw new SkipException("Skipping the disabled test - " + testMethod)
         }
+        callBack.runTestMethod(testResult)
     }
 
     @BeforeClass
     void start() {
         if (scenario.enabled == false) {
-            throw new SkipException("Skipping the disabled scenario")
+            return
         }
 
         startMockServer()
