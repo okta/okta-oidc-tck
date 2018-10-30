@@ -15,6 +15,12 @@
  */
 package com.okta.test.mock.wiremock
 
+
+import java.nio.charset.StandardCharsets
+
+import static io.restassured.RestAssured.given
+import static org.hamcrest.MatcherAssert.assertThat
+
 class TestUtils {
     static byte[] toIntegerBytes(final BigInteger bigInt) {
         int bitlen = bigInt.bitLength();
@@ -38,5 +44,28 @@ class TestUtils {
         final byte[] resizedBytes = new byte[bitlen / 8];
         System.arraycopy(bigBytes, startSrc, resizedBytes, startDst, len);
         return resizedBytes;
+    }
+
+    static Map<String, List<String>> parseQuery(String query) {
+
+        if (query == null || query.empty) {
+            return null
+        }
+
+        Map<String, List<String>> result = new HashMap<>()
+        Arrays.stream(query.split('&'))
+        .map { it.split('=', 2) }
+        .map { it.eachWithIndex { def entry, int i -> it[i] = URLDecoder.decode(entry, StandardCharsets.UTF_8.toString())}}
+        .forEach {
+            List<String> values = result.getOrDefault(it[0], new ArrayList<String>())
+            if(it.length == 2) {
+                values.add(it[1])
+            } else {
+                values.add(null)
+            }
+
+            result.put(it[0], values)
+        }
+        return result
     }
 }
