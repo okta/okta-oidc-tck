@@ -26,11 +26,9 @@ import org.testng.IHookable
 import org.testng.ITestResult
 import org.testng.annotations.AfterClass
 import org.testng.annotations.BeforeClass
-import org.testng.annotations.BeforeMethod
 import org.testng.SkipException
 import org.yaml.snakeyaml.Yaml
 
-import java.lang.reflect.Method
 import java.util.stream.Collectors
 
 import static io.restassured.RestAssured.given
@@ -69,8 +67,8 @@ abstract class ApplicationTestRunner extends HttpMock implements IHookable {
         return mockHttpsPort
     }
 
-    String getLoginRedirectPath() {
-        return app.getTestScenario().loginRedirectPath
+    String getProtectedPath() {
+        return app.getTestScenario().protectedPath
     }
 
     @Override
