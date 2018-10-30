@@ -115,7 +115,7 @@ class CodeFlowRemoteValidationIT extends ApplicationTestRunner {
     }
 
     @Override
-    String getLoginRedirectPath() {
-        return System.getProperty("redirect.path", super.getLoginRedirectPath())
+    String getProtectedPath() {
+        return System.getProperty("redirect.path", super.getProtectedPath())
     }
 }
