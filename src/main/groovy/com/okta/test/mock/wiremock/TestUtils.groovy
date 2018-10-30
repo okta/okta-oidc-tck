@@ -15,11 +15,21 @@
  */
 package com.okta.test.mock.wiremock
 
+import io.restassured.config.HttpClientConfig
+import io.restassured.config.RestAssuredConfig
+import io.restassured.http.ContentType
+import io.restassured.matcher.ResponseAwareMatcher
+import io.restassured.response.ExtractableResponse
+import io.restassured.response.Response
+import org.apache.http.client.params.ClientPNames
+import org.apache.http.client.params.CookiePolicy
+import org.hamcrest.Matcher
 
 import java.nio.charset.StandardCharsets
 
 import static io.restassured.RestAssured.given
 import static org.hamcrest.MatcherAssert.assertThat
+import static org.hamcrest.Matchers.notNullValue
 
 class TestUtils {
     static byte[] toIntegerBytes(final BigInteger bigInt) {
@@ -46,6 +56,39 @@ class TestUtils {
         return resizedBytes;
     }
 
+    static ExtractableResponse followRedirectUntilLocation(ExtractableResponse response,
+                                                           Matcher<Response> responseMatcher,
+                                                           int maxRedirects = 3) {
+
+        if (responseMatcher.matches(response)) {
+            return response
+        }
+
+        for (int ii=0; ii<maxRedirects; ii++) {
+
+            def location = response.header("Location")
+            println("redirecting to:  ${location}")
+
+            assertThat "Location is null, could not match or follow redirect", location, notNullValue()
+
+            def tempResponse = given()
+                .redirects()
+                    .follow(false)
+                .accept(ContentType.JSON)
+            .when().log().everything()
+                .cookies(response.cookies())
+                .get(location)
+            .then().log().everything()
+            .extract()
+
+            response = tempResponse
+            if (responseMatcher.matches(response)) {
+                return response
+            }
+        }
+        assertThat "Exceded max redirect follow of '${maxRedirects}' last location failure: ", response.header("Location"), responseMatcher
+    }
+
     static Map<String, List<String>> parseQuery(String query) {
 
         if (query == null || query.empty) {
@@ -67,5 +110,13 @@ class TestUtils {
             result.put(it[0], values)
         }
         return result
+    }
+
+    static RestAssuredConfig browserCompatibleRedirects() {
+        def config = RestAssuredConfig.newConfig()
+                .httpClient(HttpClientConfig.httpClientConfig()
+                    .setParam(ClientPNames.COOKIE_POLICY, CookiePolicy.BROWSER_COMPATIBILITY))
+        config.getRedirectConfig().followRedirects(true)
+        return config
     }
 }
