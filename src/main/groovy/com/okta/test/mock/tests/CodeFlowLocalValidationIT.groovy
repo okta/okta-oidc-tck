@@ -84,7 +84,7 @@ class CodeFlowLocalValidationIT extends ApplicationTestRunner {
     void respondWithCode() {
         ExtractableResponse response = redirectToRemoteLogin()
         String redirectUrl = response.header("Location")
-        String state = redirectUrl.substring(redirectUrl.lastIndexOf('=')+1)
+        String state = TestUtils.parseQuery(new URL(redirectUrl).query).get("state").get(0)
         String code = "TEST_CODE"
         String requestUrl = "http://localhost:${applicationPort}/authorization-code/callback?code=${code}&state=${state}"
 
