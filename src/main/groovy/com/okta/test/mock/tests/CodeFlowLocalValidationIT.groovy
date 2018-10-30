@@ -17,6 +17,7 @@ package com.okta.test.mock.tests
 
 import com.okta.test.mock.Scenario
 import com.okta.test.mock.application.ApplicationTestRunner
+import com.okta.test.mock.wiremock.TestUtils
 import io.restassured.builder.ResponseSpecBuilder
 import io.restassured.http.ContentType
 import io.restassured.response.ExtractableResponse
@@ -24,12 +25,14 @@ import io.restassured.specification.ResponseSpecification
 import org.hamcrest.Matcher
 import org.hamcrest.Matchers
 import org.testng.annotations.Test
-import java.util.regex.Pattern
 
+import static com.okta.test.mock.matchers.UrlMatcher.singleQueryValue
+import static com.okta.test.mock.matchers.UrlMatcher.urlMatcher
+import static com.okta.test.mock.scenarios.Scenario.CODE_FLOW_LOCAL_VALIDATION
+import static com.okta.test.mock.wiremock.TestUtils.followRedirectUntilLocation
 import static io.restassured.RestAssured.given
 import static org.hamcrest.Matchers.is
 import static org.hamcrest.text.MatchesPattern.matchesPattern
-import static com.okta.test.mock.scenarios.Scenario.CODE_FLOW_LOCAL_VALIDATION
 
 @Scenario(CODE_FLOW_LOCAL_VALIDATION)
 class CodeFlowLocalValidationIT extends ApplicationTestRunner {
@@ -41,7 +44,7 @@ class CodeFlowLocalValidationIT extends ApplicationTestRunner {
                 .follow(false)
             .accept(ContentType.JSON)
         .when()
-            .get("http://localhost:${applicationPort}/${loginRedirectPath}")
+            .get("http://localhost:${applicationPort}/${protectedPath}")
         .then()
             .statusCode(302)
             .header("Location", is("http://localhost:${applicationPort}/authorization-code/callback".toString()))
@@ -49,24 +52,23 @@ class CodeFlowLocalValidationIT extends ApplicationTestRunner {
 
     @Test
     ExtractableResponse redirectToRemoteLogin() {
-        String expectedRedirect = Pattern.quote(
-                "${baseUrl}/oauth2/default/v1/authorize" +
-                "?client_id=OOICU812" +
-                "&redirect_uri=http://localhost:${applicationPort}/authorization-code/callback" +
-                "&response_type=code" +
-                "&scope=profile%20email%20openid" +
-                "&state=")+".{6}"
 
-        return given()
+        def locationMatcher = urlMatcher("${baseUrl}/oauth2/default/v1/authorize",
+                singleQueryValue("client_id", "OOICU812"),
+                singleQueryValue("redirect_uri", "http://localhost:${applicationPort}/authorization-code/callback"),
+                singleQueryValue("response_type", "code"),
+                singleQueryValue("scope", "offline_access"),
+                singleQueryValue("state", matchesPattern(".{6,}")))
+
+        given()
             .redirects()
                 .follow(false)
             .accept(ContentType.JSON)
         .when()
-            .get("http://localhost:${applicationPort}/authorization-code/callback")
+            .get("http://localhost:${applicationPort}/${protectedPath}")
         .then()
             .statusCode(302)
-            .header("Location", matchesPattern(expectedRedirect))
-        .extract()
+            .header("Location", locationMatcher)
     }
 
     @Test

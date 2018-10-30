@@ -17,13 +17,15 @@ package com.okta.test.mock.tests
 
 import com.okta.test.mock.Scenario
 import com.okta.test.mock.application.ApplicationTestRunner
+import com.okta.test.mock.wiremock.TestUtils
 import io.restassured.http.ContentType
 import io.restassured.response.ExtractableResponse
 import org.hamcrest.Matcher
 import org.hamcrest.Matchers
 import org.testng.annotations.Test
-import java.util.regex.Pattern
 
+import static com.okta.test.mock.matchers.UrlMatcher.singleQueryValue
+import static com.okta.test.mock.matchers.UrlMatcher.urlMatcher
 import static io.restassured.RestAssured.given
 import static org.hamcrest.Matchers.is
 import static org.hamcrest.text.MatchesPattern.matchesPattern
@@ -31,39 +33,19 @@ import static com.okta.test.mock.scenarios.Scenario.CODE_FLOW_REMOTE_VALIDATION
 
 @Scenario(CODE_FLOW_REMOTE_VALIDATION)
 class CodeFlowRemoteValidationIT extends ApplicationTestRunner {
-    @Test
-    void redirectToLogin() {
-
-        given()
-            .redirects()
-                .follow(false)
-            .accept(ContentType.JSON)
-        .when()
-            .get("http://localhost:${applicationPort}/${loginRedirectPath}")
-        .then()
-            .statusCode(302)
-            .header("Location", is("http://localhost:${applicationPort}/authorization-code/callback".toString()))
-    }
 
     @Test
     ExtractableResponse redirectToRemoteLogin() {
-        String expectedRedirect = Pattern.quote(
-                "${baseUrl}/oauth2/default/v1/authorize" +
-                "?client_id=OOICU812" +
-                "&redirect_uri=http://localhost:${applicationPort}/authorization-code/callback" +
-                "&response_type=code" +
-                "&scope=profile%20email%20openid" +
-                "&state=")+".{6}"
 
         return given()
             .redirects()
                 .follow(false)
             .accept(ContentType.JSON)
         .when()
-            .get("http://localhost:${applicationPort}/authorization-code/callback")
+            .get("http://localhost:${applicationPort}${protectedPath}")
         .then()
             .statusCode(302)
-            .header("Location", matchesPattern(expectedRedirect))
+            .header("Location", loginPageLocationMatcher())
         .extract()
     }
 
@@ -72,7 +54,7 @@ class CodeFlowRemoteValidationIT extends ApplicationTestRunner {
         given()
             .accept(ContentType.JSON)
         .when()
-            .get("http://localhost:${applicationPort}/profile")
+            .get("http://localhost:${applicationPort}${protectedPath}")
         .then()
             .statusCode(200)
             .body(loginPageMatcher())
@@ -95,7 +77,7 @@ class CodeFlowRemoteValidationIT extends ApplicationTestRunner {
             .get(requestUrl)
         .then()
             .statusCode(302)
-                .header("Location", Matchers.equalTo("http://localhost:${applicationPort}/".toString()))
+            .header("Location", is("http://localhost:${applicationPort}/".toString()))
         .extract()
 
         given()
@@ -106,12 +88,21 @@ class CodeFlowRemoteValidationIT extends ApplicationTestRunner {
         .when()
             .get("http://localhost:${applicationPort}/")
         .then()
-            .body(Matchers.equalTo("The message of the day is boring: joe.coder@example.com"))
+            .body(Matchers.containsString("Welcome home"))
 
     }
 
     protected Matcher<?> loginPageMatcher() {
         return Matchers.equalTo("<html>fake_login_page<html/>")
+    }
+
+    protected Matcher loginPageLocationMatcher() {
+        return urlMatcher("${baseUrl}/oauth2/default/v1/authorize",
+                singleQueryValue("client_id", "OOICU812"),
+                singleQueryValue("redirect_uri", "http://localhost:${applicationPort}/authorization-code/callback"),
+                singleQueryValue("response_type", "code"),
+                singleQueryValue("scope", "offline_access"),
+                singleQueryValue("state", matchesPattern(".{6,}")))
     }
 
     @Override
