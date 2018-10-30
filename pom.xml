@@ -99,6 +99,10 @@
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.apache.sling</groupId>
+                    <artifactId>org.apache.sling.javax.activation</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
