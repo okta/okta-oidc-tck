@@ -29,7 +29,6 @@ import org.testng.annotations.Test
 import static com.okta.test.mock.matchers.UrlMatcher.singleQueryValue
 import static com.okta.test.mock.matchers.UrlMatcher.urlMatcher
 import static com.okta.test.mock.scenarios.Scenario.CODE_FLOW_LOCAL_VALIDATION
-import static com.okta.test.mock.wiremock.TestUtils.followRedirectUntilLocation
 import static io.restassured.RestAssured.given
 import static org.hamcrest.Matchers.is
 import static org.hamcrest.text.MatchesPattern.matchesPattern
