@@ -55,7 +55,7 @@ class TckMatchers {
 
     static Matcher<Response> bodyMatcher(Matcher<String> body) {
 
-        new TypeSafeMatcher<Response>() {
+        return new TypeSafeMatcher<Response>() {
             @Override
             protected boolean matchesSafely(Response response) {
                 return body.matches(response.body().asString())
@@ -69,7 +69,7 @@ class TckMatchers {
     }
 
     static Matcher<Response> redirect(Matcher<String> location) {
-        allOf(
+        return allOf(
             header("Location", location),
             responseCode(302)
         )

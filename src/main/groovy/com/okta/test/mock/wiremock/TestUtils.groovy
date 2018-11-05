@@ -75,10 +75,10 @@ class TestUtils {
                 .redirects()
                     .follow(false)
                 .accept(ContentType.JSON)
-            .when().log().everything()
+            .when()
                 .cookies(response.cookies())
                 .get(location)
-            .then().log().everything()
+            .then()
             .extract()
 
             response = tempResponse
@@ -95,6 +95,7 @@ class TestUtils {
             return null
         }
 
+        // convert the query portion into an map with multiple values i.e. "?foo=bar1&foo=bar2" turns into "foo": ["bar1" "bar2"]
         Map<String, List<String>> result = new HashMap<>()
         Arrays.stream(query.split('&'))
         .map { it.split('=', 2) }
@@ -102,8 +103,10 @@ class TestUtils {
         .forEach {
             List<String> values = result.getOrDefault(it[0], new ArrayList<String>())
             if(it.length == 2) {
+                // typical value for query param, i.e. ?foo=bar
                 values.add(it[1])
             } else {
+                // no value for query param, i.e. ?foo
                 values.add(null)
             }
 

@@ -90,7 +90,8 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String code = "TEST_CODE"
         String requestUrl = "http://localhost:${applicationPort}/authorization-code/callback?code=${code}&state=${state}"
 
-        assertAccessDenied(given()
+        assertAccessDenied(
+            given()
                 .accept(ContentType.JSON)
                 .cookies(response.cookies())
                 .redirects()
@@ -108,15 +109,16 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String state = getState(redirectUrl)
         String requestUrl = "http://localhost:${applicationPort}/authorization-code/callback?state=${state}"
 
-        assertAccessDenied(given()
-            .accept(ContentType.JSON)
-            .cookies(response.cookies())
-            .redirects()
-                .follow(false)
-        .when()
-            .get(requestUrl)
-        .then()
-            .extract())
+        assertAccessDenied(
+            given()
+                .accept(ContentType.JSON)
+                .cookies(response.cookies())
+                .redirects()
+                    .follow(false)
+            .when()
+                .get(requestUrl)
+            .then()
+                .extract())
     }
 
     @Test
@@ -127,15 +129,16 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String code = "TEST_CODE_invalidSignatureIdTokenJwt"
         String requestUrl = "http://localhost:${applicationPort}/authorization-code/callback?code=${code}&state=${state}"
 
-        assertAccessDenied(given()
-            .accept(ContentType.JSON)
-            .cookies(response.cookies())
-            .redirects()
-                .follow(false)
-        .when()
-            .get(requestUrl)
-        .then()
-            .extract())
+        assertAccessDenied(
+            given()
+                .accept(ContentType.JSON)
+                .cookies(response.cookies())
+                .redirects()
+                    .follow(false)
+            .when()
+                .get(requestUrl)
+            .then()
+                .extract())
     }
 
     @Test
@@ -146,15 +149,16 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String code = "TEST_CODE_wrongKeyIdIdTokenJwt"
         String requestUrl = "http://localhost:${applicationPort}/authorization-code/callback?code=${code}&state=${state}"
 
-        assertAccessDenied(given()
-            .accept(ContentType.JSON)
-            .cookies(response.cookies())
-            .redirects()
-                .follow(false)
-        .when()
-            .get(requestUrl)
-        .then()
-            .extract())
+        assertAccessDenied(
+            given()
+                .accept(ContentType.JSON)
+                .cookies(response.cookies())
+                .redirects()
+                    .follow(false)
+            .when()
+                .get(requestUrl)
+            .then()
+                .extract())
     }
 
     @Test
@@ -165,15 +169,16 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String code = "TEST_CODE_issuedInFutureIdTokenJwt"
         String requestUrl = "http://localhost:${applicationPort}/authorization-code/callback?code=${code}&state=${state}"
 
-        assertAccessDenied(given()
-            .accept(ContentType.JSON)
-            .cookies(response.cookies())
-            .redirects()
-                .follow(false)
-        .when()
-            .get(requestUrl)
-        .then()
-            .extract())
+        assertAccessDenied(
+            given()
+                .accept(ContentType.JSON)
+                .cookies(response.cookies())
+                .redirects()
+                    .follow(false)
+            .when()
+                .get(requestUrl)
+            .then()
+                .extract())
     }
 
     @Test
@@ -185,15 +190,15 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String requestUrl = "http://localhost:${applicationPort}/authorization-code/callback?code=${code}&state=${state}"
 
         assertAccessDenied(
-        given()
-            .accept(ContentType.JSON)
-            .cookies(response.cookies())
-            .redirects()
-                .follow(false)
-        .when()
-            .get(requestUrl)
-        .then()
-            .extract())
+            given()
+                .accept(ContentType.JSON)
+                .cookies(response.cookies())
+                .redirects()
+                    .follow(false)
+            .when()
+                .get(requestUrl)
+            .then()
+                .extract())
     }
 
     @Test
@@ -204,15 +209,16 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String code = "TEST_CODE_wrongAudienceIdTokenJwt"
         String requestUrl = "http://localhost:${applicationPort}/authorization-code/callback?code=${code}&state=${state}"
 
-        assertAccessDenied(given()
-            .accept(ContentType.JSON)
-            .cookies(response.cookies())
-            .redirects()
-                .follow(false)
-        .when()
-            .get(requestUrl)
-        .then()
-            .extract())
+        assertAccessDenied(
+            given()
+                .accept(ContentType.JSON)
+                .cookies(response.cookies())
+                .redirects()
+                    .follow(false)
+            .when()
+                .get(requestUrl)
+            .then()
+                .extract())
     }
 
     @Test
@@ -223,15 +229,16 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String code = "TEST_CODE_invalidIssuerIdTokenJwt"
         String requestUrl = "http://localhost:${applicationPort}/authorization-code/callback?code=${code}&state=${state}"
 
-        assertAccessDenied(given()
-            .accept(ContentType.JSON)
-            .cookies(response.cookies())
-            .redirects()
-                .follow(false)
-        .when()
-            .get(requestUrl)
-        .then()
-            .extract())
+        assertAccessDenied(
+            given()
+                .accept(ContentType.JSON)
+                .cookies(response.cookies())
+                .redirects()
+                    .follow(false)
+            .when()
+                .get(requestUrl)
+            .then()
+                .extract())
     }
 
     @Test
@@ -261,15 +268,16 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String code = "TEST_CODE_unsignedIdTokenJwt"
         String requestUrl = "http://localhost:${applicationPort}/authorization-code/callback?code=${code}&state=${state}"
 
-        assertAccessDenied(given()
-            .accept(ContentType.JSON)
-            .cookies(response.cookies())
-            .redirects()
-                .follow(false)
-        .when()
-            .get(requestUrl)
-        .then()
-            .extract())
+        assertAccessDenied(
+            given()
+                .accept(ContentType.JSON)
+                .cookies(response.cookies())
+                .redirects()
+                    .follow(false)
+            .when()
+                .get(requestUrl)
+            .then()
+                .extract())
     }
 
     private String getState(String redirectUrl) {

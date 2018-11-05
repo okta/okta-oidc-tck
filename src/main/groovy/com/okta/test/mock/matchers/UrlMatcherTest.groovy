@@ -15,14 +15,11 @@
  */
 package com.okta.test.mock.matchers
 
-import org.hamcrest.Matchers
-import org.hamcrest.collection.IsMapContaining
 import org.testng.annotations.Test
 
 import static com.okta.test.mock.matchers.UrlMatcher.singleQueryValue
 import static com.okta.test.mock.matchers.UrlMatcher.urlMatcher
 
-import static org.hamcrest.Matchers.*
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.text.MatchesPattern.matchesPattern
 
@@ -47,7 +44,6 @@ class UrlMatcherTest {
 
     @Test
     void complexTest() {
-
         assertThat "http://test.example.com:1234/oauth2/default/v1/authorize" +
                         "?redirect_uri=http://localhost:123456/authorization-code/callback" +
                         "&client_id=OOICU812" +
@@ -65,7 +61,6 @@ class UrlMatcherTest {
 
     @Test
     void anotherComplexTest() {
-
         def locationMatcher = urlMatcher("https://localhost:58987/oauth2/default/v1/authorize",
                 singleQueryValue("client_id", "OOICU812"),
                 singleQueryValue("redirect_uri", "http://localhost:58985/authorization-code/callback"),
