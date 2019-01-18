@@ -37,8 +37,11 @@ describe('Custom Login Flow', () => {
     loginHomePage.clickLoginButton();
     customSignInPage.waitForPageLoad();
 
-    // Verify that curent domain hasn't changed to okta-hosted login, rather a local custom login page
-    expect(browser.getCurrentUrl()).not.toContain('okta');
+    // Verify that current domain hasn't changed to okta-hosted login, rather a local custom login page
+    const currentUrl = await browser.getCurrentUrl();
+    const isTrexOrg = currentUrl.includes('trex');
+    const isPreviewOrg = currentUrl.includes('okta');
+    expect(isTrexOrg || isPreviewOrg).toBe(false);
     expect(browser.getCurrentUrl()).toContain(appRoot);
 
     await customSignInPage.login(browser.params.login.username, browser.params.login.password);
