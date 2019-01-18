@@ -37,8 +37,12 @@ describe('Okta Hosted Login Flow', () => {
     loginHomePage.clickLoginButton();
     oktaSignInPage.waitForPageLoad();
 
-    // Verify that curent domain has changed to okta-hosted login page
-    expect(browser.getCurrentUrl()).toContain('okta');
+    // Verify that current domain has changed to okta-hosted login page
+    const currentUrl = await browser.getCurrentUrl();
+    const isTrexOrg = currentUrl.includes('trex');
+    const isPreviewOrg = currentUrl.includes('okta');
+    expect(isTrexOrg || isPreviewOrg).toBe(true);
+    expect(browser.getCurrentUrl()).not.toContain(appRoot);
     expect(browser.getCurrentUrl()).not.toContain(appRoot);
 
     await oktaSignInPage.login(browser.params.login.username, browser.params.login.password);
