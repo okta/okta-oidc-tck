@@ -36,4 +36,24 @@
         <cve>CVE-2017-9735</cve>
     </suppress>
 
+    <suppress>
+        <notes><![CDATA[
+        wrong GAV, this CVE affects a golang project named jsonpatch:
+        https://github.com/evanphx/json-patch
+
+        coordinate: cpe:2.3:a:json-patch_project:json-patch:-:*:*:*:*:*:*:go ]]></notes>
+        <gav regex="true">^com\.flipkart\.zjsonpatch:zjsonpatch:.*$</gav>
+        <cve>CVE-2018-14632</cve>
+    </suppress>
+
+    <suppress>
+        <notes><![CDATA[
+        file name: wiremock-standalone-2.20.0.jar/META-INF/maven/com.google.guava/guava/pom.xml
+
+        Unbounded memory allocation - Ignore for the context of testing, as HTTP requests are controlled and wiremock
+        starts/stops a server for test usage only.]]></notes>
+        <gav regex="true">^com\.google\.guava:guava:.*$</gav>
+        <cve>CVE-2018-10237</cve>
+    </suppress>
+
 </suppressions>
