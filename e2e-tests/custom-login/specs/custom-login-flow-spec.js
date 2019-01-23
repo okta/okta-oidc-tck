@@ -17,6 +17,7 @@ const CustomSignInPage = require('../../page-objects/custom-signin-page');
 const AuthenticatedHomePage = require('../../page-objects/shared/authenticated-home-page');
 const ProfilePage = require('../../page-objects/shared/profile-page');
 const MessagesPage = require('../../page-objects/messages-page');
+const url = require('url');
 
 describe('Custom Login Flow', () => {
   const loginHomePage = new LoginHomePage();
@@ -38,10 +39,8 @@ describe('Custom Login Flow', () => {
     customSignInPage.waitForPageLoad();
 
     // Verify that current domain hasn't changed to okta-hosted login, rather a local custom login page
-    const currentUrl = await browser.getCurrentUrl();
-    const isTrexOrg = currentUrl.includes('trex');
-    const isPreviewOrg = currentUrl.includes('okta');
-    expect(isTrexOrg || isPreviewOrg).toBe(false);
+    const urlProperties = url.parse(process.env.ISSUER);
+    expect(browser.getCurrentUrl()).not.toContain(urlProperties.host);
     expect(browser.getCurrentUrl()).toContain(appRoot);
 
     await customSignInPage.login(browser.params.login.username, browser.params.login.password);

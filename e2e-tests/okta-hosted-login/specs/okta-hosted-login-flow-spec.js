@@ -17,6 +17,7 @@ const OktaSignInPage = require('../../page-objects/okta-signin-page');
 const AuthenticatedHomePage = require('../../page-objects/shared/authenticated-home-page');
 const ProfilePage = require('../../page-objects/shared/profile-page');
 const MessagesPage = require('../../page-objects/messages-page');
+const url = require('url');
 
 describe('Okta Hosted Login Flow', () => {
   const loginHomePage = new LoginHomePage();
@@ -38,11 +39,8 @@ describe('Okta Hosted Login Flow', () => {
     oktaSignInPage.waitForPageLoad();
 
     // Verify that current domain has changed to okta-hosted login page
-    const currentUrl = await browser.getCurrentUrl();
-    const isTrexOrg = currentUrl.includes('trex');
-    const isPreviewOrg = currentUrl.includes('okta');
-    expect(isTrexOrg || isPreviewOrg).toBe(true);
-    expect(browser.getCurrentUrl()).not.toContain(appRoot);
+    const urlProperties = url.parse(process.env.ISSUER);
+    expect(browser.getCurrentUrl()).toContain(urlProperties.host);
     expect(browser.getCurrentUrl()).not.toContain(appRoot);
 
     await oktaSignInPage.login(browser.params.login.username, browser.params.login.password);
