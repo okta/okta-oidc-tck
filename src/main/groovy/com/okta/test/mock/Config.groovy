@@ -18,6 +18,16 @@ package com.okta.test.mock
 class Config {
     String implementation = "com.okta.test.mock.application.CliApplicationUnderTest"
     Map<String, TestScenario> scenarios = new LinkedHashMap<>()
+
+    static class Global {
+        static String getConfigProperty(String key, String defaultValue = null) {
+            return System.getProperty(key, defaultValue)
+        }
+
+        static String getCodeFlowRedirectPath() {
+            return getConfigProperty("codeFlow.redirectPath", "/authorization-code/callback")
+        }
+    }
 }
 
 class TestScenario {

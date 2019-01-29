@@ -15,6 +15,7 @@
  */
 package com.okta.test.mock.tests
 
+import com.okta.test.mock.Config
 import com.okta.test.mock.Scenario
 import org.hamcrest.Matcher
 import org.hamcrest.Matchers
@@ -36,7 +37,7 @@ class CustomLoginCodeFlowRemoteValidationIT extends CodeFlowRemoteValidationIT {
     protected Matcher loginPageLocationMatcher() {
         return urlMatcher("http://localhost:${applicationPort}/custom-login",
                 singleQueryValue("client_id", "OOICU812"),
-                singleQueryValue("redirect_uri", "http://localhost:${applicationPort}/authorization-code/callback"),
+                singleQueryValue("redirect_uri", "http://localhost:${applicationPort}${Config.Global.codeFlowRedirectPath}"),
                 singleQueryValue("response_type", "code"),
                 singleQueryValue("scope", "offline_access"),
                 singleQueryValue("state", matchesPattern(".{6,}")))

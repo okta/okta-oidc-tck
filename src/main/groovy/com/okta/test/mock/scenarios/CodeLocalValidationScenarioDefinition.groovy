@@ -16,11 +16,13 @@
 package com.okta.test.mock.scenarios
 
 import com.github.tomakehurst.wiremock.WireMockServer
+import com.okta.test.mock.Config
 import com.okta.test.mock.wiremock.TestUtils
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import org.apache.commons.codec.binary.Base64
 
+import java.nio.charset.StandardCharsets
 import java.security.KeyPair
 import java.security.KeyPairGenerator
 import java.time.Instant
@@ -147,6 +149,10 @@ class CodeLocalValidationScenarioDefinition implements ScenarioDefinition {
 
     @Override
     void configureHttpMock(WireMockServer wireMockServer, String baseUrl) {
+
+        def redirectUriPath = Config.Global.codeFlowRedirectPath
+        def redirectUriPathEscaped = URLEncoder.encode(redirectUriPath, StandardCharsets.UTF_8.toString())
+
         wireMockServer.stubFor(
                 get("/oauth2/default/.well-known/openid-configuration")
                         .willReturn(aResponse()
@@ -157,7 +163,7 @@ class CodeLocalValidationScenarioDefinition implements ScenarioDefinition {
         wireMockServer.stubFor(
                 get(urlPathEqualTo("/oauth2/default/v1/authorize"))
                         .withQueryParam("client_id", matching(clientId))
-                        .withQueryParam("redirect_uri", matching(Pattern.quote("http://localhost:")+ "\\d+/authorization-code/callback"))
+                        .withQueryParam("redirect_uri", matching(Pattern.quote("http://localhost:")+ "\\d+${redirectUriPath}"))
                         .withQueryParam("response_type", matching("code"))
                         .withQueryParam("scope", matching("offline_access"))
                         .withQueryParam("state", matching(".{6,}"))
@@ -169,7 +175,7 @@ class CodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                         .withHeader("Authorization", equalTo(authHeader))
                         .withRequestBody(containing("grant_type=authorization_code"))
                         .withRequestBody(containing("code=TEST_CODE&"))
-                        .withRequestBody(matching(".*"+Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" +Pattern.quote("%2Fauthorization-code%2Fcallback") +".*"))
+                        .withRequestBody(matching(".*"+Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" +Pattern.quote(redirectUriPathEscaped) +".*"))
                         .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json;charset=UTF-8")
                         .withBodyFile("token.json")
@@ -180,7 +186,7 @@ class CodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                         .withHeader("Authorization", equalTo(authHeader))
                         .withRequestBody(containing("grant_type=authorization_code"))
                         .withRequestBody(containing("code=TEST_CODE_wrongKeyIdAccessTokenJwt&"))
-                        .withRequestBody(matching(".*"+Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" +Pattern.quote("%2Fauthorization-code%2Fcallback")  +".*"))
+                        .withRequestBody(matching(".*"+Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" +Pattern.quote(redirectUriPathEscaped)  +".*"))
                         .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json;charset=UTF-8")
                         .withBodyFile("token.json")
@@ -191,7 +197,7 @@ class CodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                         .withHeader("Authorization", equalTo(authHeader))
                         .withRequestBody(containing("grant_type=authorization_code"))
                         .withRequestBody(containing("code=TEST_CODE_wrongScopeAccessTokenJwt&"))
-                        .withRequestBody(matching(".*"+Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" +Pattern.quote("%2Fauthorization-code%2Fcallback")  +".*"))
+                        .withRequestBody(matching(".*"+Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" +Pattern.quote(redirectUriPathEscaped)  +".*"))
                         .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json;charset=UTF-8")
                         .withBodyFile("token.json")
@@ -202,7 +208,7 @@ class CodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                         .withHeader("Authorization", equalTo(authHeader))
                         .withRequestBody(containing("grant_type=authorization_code"))
                         .withRequestBody(containing("code=TEST_CODE_wrongAudienceAccessTokenJwt&"))
-                        .withRequestBody(matching(".*"+Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" +Pattern.quote("%2Fauthorization-code%2Fcallback")  +".*"))
+                        .withRequestBody(matching(".*"+Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" +Pattern.quote(redirectUriPathEscaped)  +".*"))
                         .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json;charset=UTF-8")
                         .withBodyFile("token.json")
@@ -213,7 +219,7 @@ class CodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                         .withHeader("Authorization", equalTo(authHeader))
                         .withRequestBody(containing("grant_type=authorization_code"))
                         .withRequestBody(containing("code=TEST_CODE_invalidSignatureAccessTokenJwt&"))
-                        .withRequestBody(matching(".*"+Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" +Pattern.quote("%2Fauthorization-code%2Fcallback")  +".*"))
+                        .withRequestBody(matching(".*"+Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" +Pattern.quote(redirectUriPathEscaped)  +".*"))
                         .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json;charset=UTF-8")
                         .withBodyFile("token.json")
