@@ -18,7 +18,9 @@ package com.okta.test.mock.wiremock
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.common.ClasspathFileSource
+import com.github.tomakehurst.wiremock.common.ConsoleNotifier
 import com.github.tomakehurst.wiremock.common.FileSource
+import com.github.tomakehurst.wiremock.common.Slf4jNotifier
 import com.github.tomakehurst.wiremock.extension.Parameters
 import com.github.tomakehurst.wiremock.extension.ResponseTransformer
 import com.github.tomakehurst.wiremock.http.Request
@@ -74,6 +76,7 @@ abstract class HttpMock {
                 def stubsPath = stubsURL.toString().contains("BOOT-INF/classes") ? "BOOT-INF/classes/stubs" : "stubs"
 
                 wireMockServer = new WireMockServer(wireMockConfig()
+                        .notifier(new Slf4jNotifier(true))
                         .port(getMockPort())
                         .httpsPort(getMockHttpsPort())
                         .keystorePath(keyStorePath)
