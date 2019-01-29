@@ -76,15 +76,21 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String code = "TEST_CODE"
         String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
 
-        given()
-            .config(TestUtils.browserCompatibleRedirects())
-            .accept(ContentType.JSON)
-            .cookies(response.cookies())
-        .when()
-            .get(requestUrl)
-        .then()
-            .statusCode(200)
-            .body(Matchers.containsString("Welcome home"))
+        ExtractableResponse initialResponse = given()
+                .redirects()
+                    .follow(false)
+                .accept(ContentType.JSON)
+                .cookies(response.cookies())
+            .when().log().everything()
+                .get(requestUrl)
+            .then()
+                .extract()
+
+        followRedirectUntilLocation(initialResponse,
+                                    allOf(TckMatchers.responseCode(200),
+                                          TckMatchers.bodyMatcher(containsString("Welcome home"))),
+                                    3,
+                                    "http://localhost:${applicationPort}")
     }
 
     @Test
