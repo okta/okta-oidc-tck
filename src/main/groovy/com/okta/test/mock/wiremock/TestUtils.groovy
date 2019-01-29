@@ -58,7 +58,8 @@ class TestUtils {
 
     static ExtractableResponse followRedirectUntilLocation(ExtractableResponse response,
                                                            Matcher<Response> responseMatcher,
-                                                           int maxRedirects = 3) {
+                                                           int maxRedirects = 3,
+                                                           String baseUrl = "") {
 
         if (responseMatcher.matches(response)) {
             return response
@@ -67,9 +68,13 @@ class TestUtils {
         for (int ii=0; ii<maxRedirects; ii++) {
 
             def location = response.header("Location")
+            if (location != null && !new URI(location).isAbsolute() ) {
+                location = baseUrl + location
+            }
+
             println("redirecting to:  ${location}")
 
-            assertThat "Location is null, could not match or follow redirect", location, notNullValue()
+            assertThat "Location is null, could not match or follow redirect, status: "+ response.statusCode(), location, notNullValue()
 
             def tempResponse = given()
                 .redirects()
@@ -79,7 +84,7 @@ class TestUtils {
                 .cookies(response.cookies())
                 .get(location)
             .then()
-            .extract()
+                .extract()
 
             response = tempResponse
             if (responseMatcher.matches(response)) {

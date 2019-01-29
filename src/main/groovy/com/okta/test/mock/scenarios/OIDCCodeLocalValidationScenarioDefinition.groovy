@@ -16,11 +16,13 @@
 package com.okta.test.mock.scenarios
 
 import com.github.tomakehurst.wiremock.WireMockServer
+import com.okta.test.mock.Config
 import com.okta.test.mock.wiremock.TestUtils
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import org.apache.commons.codec.binary.Base64
 
+import java.nio.charset.StandardCharsets
 import java.security.KeyPair
 import java.security.KeyPairGenerator
 import java.time.Instant
@@ -219,6 +221,9 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
     @Override
     void configureHttpMock(WireMockServer wireMockServer, String baseUrl) {
 
+        def redirectUriPath = Config.Global.codeFlowRedirectPath
+        def redirectUriPathEscaped = URLEncoder.encode(redirectUriPath, StandardCharsets.UTF_8.toString())
+
         configureBindings("${baseUrl}/oauth2/default")
 
         bindingMap.putAll([
@@ -238,7 +243,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
         wireMockServer.stubFor(
                 get(urlPathEqualTo("/oauth2/default/v1/authorize"))
                         .withQueryParam("client_id", matching(clientId))
-                        .withQueryParam("redirect_uri", matching(Pattern.quote("http://localhost:")+ "\\d+/authorization-code/callback"))
+                        .withQueryParam("redirect_uri", matching(Pattern.quote("http://localhost:")+ "\\d+${redirectUriPath}"))
                         .withQueryParam("response_type", matching("code"))
                         .withQueryParam("scope", matching("profile email openid"))
                         .withQueryParam("state", matching(".{6,}"))
@@ -250,7 +255,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                         .withHeader("Authorization", equalTo(authHeader))
                         .withRequestBody(containing("grant_type=authorization_code"))
                         .withRequestBody(containing("code=TEST_CODE&"))
-                        .withRequestBody(matching(".*"+Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" +Pattern.quote("%2Fauthorization-code%2Fcallback") +".*"))
+                        .withRequestBody(matching(".*"+Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" +Pattern.quote(redirectUriPathEscaped) +".*"))
                         .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json;charset=UTF-8")
                         .withBodyFile("token.json")
@@ -261,7 +266,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                         .withHeader("Authorization", equalTo(authHeader))
                         .withRequestBody(containing("grant_type=authorization_code"))
                         .withRequestBody(containing("code=TEST_CODE_wrongKeyIdIdTokenJwt&"))
-                        .withRequestBody(matching(".*"+Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" +Pattern.quote("%2Fauthorization-code%2Fcallback")  +".*"))
+                        .withRequestBody(matching(".*"+Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" +Pattern.quote(redirectUriPathEscaped)  +".*"))
                         .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json;charset=UTF-8")
                         .withBodyFile("token.json")
@@ -272,7 +277,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                         .withHeader("Authorization", equalTo(authHeader))
                         .withRequestBody(containing("grant_type=authorization_code"))
                         .withRequestBody(containing("code=TEST_CODE_invalidSignatureIdTokenJwt&"))
-                        .withRequestBody(matching(".*"+Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" +Pattern.quote("%2Fauthorization-code%2Fcallback")  +".*"))
+                        .withRequestBody(matching(".*"+Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" +Pattern.quote(redirectUriPathEscaped)  +".*"))
                         .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json;charset=UTF-8")
                         .withBodyFile("token.json")
@@ -283,7 +288,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                         .withHeader("Authorization", equalTo(authHeader))
                         .withRequestBody(containing("grant_type=authorization_code"))
                         .withRequestBody(containing("code=TEST_CODE_invalidIssuerIdTokenJwt&"))
-                        .withRequestBody(matching(".*"+Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" +Pattern.quote("%2Fauthorization-code%2Fcallback")  +".*"))
+                        .withRequestBody(matching(".*"+Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" +Pattern.quote(redirectUriPathEscaped)  +".*"))
                         .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json;charset=UTF-8")
                         .withBodyFile("token.json")
@@ -294,7 +299,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                         .withHeader("Authorization", equalTo(authHeader))
                         .withRequestBody(containing("grant_type=authorization_code"))
                         .withRequestBody(containing("code=TEST_CODE_issuedInFutureIdTokenJwt&"))
-                        .withRequestBody(matching(".*"+Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" +Pattern.quote("%2Fauthorization-code%2Fcallback")  +".*"))
+                        .withRequestBody(matching(".*"+Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" +Pattern.quote(redirectUriPathEscaped)  +".*"))
                         .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json;charset=UTF-8")
                         .withBodyFile("token.json")
@@ -305,7 +310,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                         .withHeader("Authorization", equalTo(authHeader))
                         .withRequestBody(containing("grant_type=authorization_code"))
                         .withRequestBody(containing("code=TEST_CODE_expiredIdTokenJwt&"))
-                        .withRequestBody(matching(".*"+Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" +Pattern.quote("%2Fauthorization-code%2Fcallback")  +".*"))
+                        .withRequestBody(matching(".*"+Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" +Pattern.quote(redirectUriPathEscaped)  +".*"))
                         .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json;charset=UTF-8")
                         .withBodyFile("token.json")
@@ -316,7 +321,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                         .withHeader("Authorization", equalTo(authHeader))
                         .withRequestBody(containing("grant_type=authorization_code"))
                         .withRequestBody(containing("code=TEST_CODE_wrongAudienceIdTokenJwt&"))
-                        .withRequestBody(matching(".*"+Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" +Pattern.quote("%2Fauthorization-code%2Fcallback")  +".*"))
+                        .withRequestBody(matching(".*"+Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" +Pattern.quote(redirectUriPathEscaped)  +".*"))
                         .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json;charset=UTF-8")
                         .withBodyFile("token.json")
@@ -327,7 +332,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                         .withHeader("Authorization", equalTo(authHeader))
                         .withRequestBody(containing("grant_type=authorization_code"))
                         .withRequestBody(containing("code=TEST_CODE_invalidNotBeforeIdTokenJwt&"))
-                        .withRequestBody(matching(".*"+Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" +Pattern.quote("%2Fauthorization-code%2Fcallback")  +".*"))
+                        .withRequestBody(matching(".*"+Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" +Pattern.quote(redirectUriPathEscaped)  +".*"))
                         .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json;charset=UTF-8")
                         .withBodyFile("token.json")
@@ -338,7 +343,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                         .withHeader("Authorization", equalTo(authHeader))
                         .withRequestBody(containing("grant_type=authorization_code"))
                         .withRequestBody(containing("code=TEST_CODE_unsignedIdTokenJwt&"))
-                        .withRequestBody(matching(".*"+Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" +Pattern.quote("%2Fauthorization-code%2Fcallback")  +".*"))
+                        .withRequestBody(matching(".*"+Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" +Pattern.quote(redirectUriPathEscaped)  +".*"))
                         .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json;charset=UTF-8")
                         .withBodyFile("token.json")

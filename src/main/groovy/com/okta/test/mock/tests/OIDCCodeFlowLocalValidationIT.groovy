@@ -15,6 +15,7 @@
  */
 package com.okta.test.mock.tests
 
+import com.okta.test.mock.Config
 import com.okta.test.mock.Scenario
 import com.okta.test.mock.application.ApplicationTestRunner
 import com.okta.test.mock.matchers.TckMatchers
@@ -29,6 +30,7 @@ import org.testng.annotations.Test
 import static com.okta.test.mock.matchers.UrlMatcher.singleQueryValue
 import static com.okta.test.mock.matchers.UrlMatcher.urlMatcher
 import static io.restassured.RestAssured.given
+import static org.hamcrest.Matchers.allOf
 import static org.hamcrest.Matchers.anyOf
 import static org.hamcrest.Matchers.containsString
 import static org.hamcrest.text.MatchesPattern.matchesPattern
@@ -37,6 +39,9 @@ import static com.okta.test.mock.wiremock.TestUtils.followRedirectUntilLocation
 
 @Scenario(OIDC_CODE_FLOW_LOCAL_VALIDATION)
 class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
+
+    private def redirectUriPath = Config.Global.codeFlowRedirectPath
+
     @Test
     ExtractableResponse redirectToRemoteLogin() {
 
@@ -69,7 +74,7 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String redirectUrl = response.header("Location")
         String state = getState(redirectUrl)
         String code = "TEST_CODE"
-        String requestUrl = "http://localhost:${applicationPort}/authorization-code/callback?code=${code}&state=${state}"
+        String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
 
         given()
             .config(TestUtils.browserCompatibleRedirects())
@@ -88,7 +93,7 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String redirectUrl = response.header("Location")
         String state = getState(redirectUrl) + "wrong"
         String code = "TEST_CODE"
-        String requestUrl = "http://localhost:${applicationPort}/authorization-code/callback?code=${code}&state=${state}"
+        String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
 
         assertAccessDenied(
             given()
@@ -107,7 +112,7 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         ExtractableResponse response = redirectToRemoteLogin()
         String redirectUrl = response.header("Location")
         String state = getState(redirectUrl)
-        String requestUrl = "http://localhost:${applicationPort}/authorization-code/callback?state=${state}"
+        String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?state=${state}"
 
         assertAccessDenied(
             given()
@@ -127,7 +132,7 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String redirectUrl = response.header("Location")
         String state = getState(redirectUrl)
         String code = "TEST_CODE_invalidSignatureIdTokenJwt"
-        String requestUrl = "http://localhost:${applicationPort}/authorization-code/callback?code=${code}&state=${state}"
+        String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
 
         assertAccessDenied(
             given()
@@ -147,7 +152,7 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String redirectUrl = response.header("Location")
         String state = getState(redirectUrl)
         String code = "TEST_CODE_wrongKeyIdIdTokenJwt"
-        String requestUrl = "http://localhost:${applicationPort}/authorization-code/callback?code=${code}&state=${state}"
+        String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
 
         assertAccessDenied(
             given()
@@ -167,7 +172,7 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String redirectUrl = response.header("Location")
         String state = getState(redirectUrl)
         String code = "TEST_CODE_issuedInFutureIdTokenJwt"
-        String requestUrl = "http://localhost:${applicationPort}/authorization-code/callback?code=${code}&state=${state}"
+        String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
 
         assertAccessDenied(
             given()
@@ -187,7 +192,7 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String redirectUrl = response.header("Location")
         String state = getState(redirectUrl)
         String code = "TEST_CODE_expiredIdTokenJwt"
-        String requestUrl = "http://localhost:${applicationPort}/authorization-code/callback?code=${code}&state=${state}"
+        String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
 
         assertAccessDenied(
             given()
@@ -207,7 +212,7 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String redirectUrl = response.header("Location")
         String state = getState(redirectUrl)
         String code = "TEST_CODE_wrongAudienceIdTokenJwt"
-        String requestUrl = "http://localhost:${applicationPort}/authorization-code/callback?code=${code}&state=${state}"
+        String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
 
         assertAccessDenied(
             given()
@@ -227,7 +232,7 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String redirectUrl = response.header("Location")
         String state = getState(redirectUrl)
         String code = "TEST_CODE_invalidIssuerIdTokenJwt"
-        String requestUrl = "http://localhost:${applicationPort}/authorization-code/callback?code=${code}&state=${state}"
+        String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
 
         assertAccessDenied(
             given()
@@ -247,7 +252,7 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String redirectUrl = response.header("Location")
         String state = getState(redirectUrl)
         String code = "TEST_CODE_invalidNotBeforeIdTokenJwt"
-        String requestUrl = "http://localhost:${applicationPort}/authorization-code/callback?code=${code}&state=${state}"
+        String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
 
         assertAccessDenied(given()
             .accept(ContentType.JSON)
@@ -266,7 +271,7 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String redirectUrl = response.header("Location")
         String state = getState(redirectUrl)
         String code = "TEST_CODE_unsignedIdTokenJwt"
-        String requestUrl = "http://localhost:${applicationPort}/authorization-code/callback?code=${code}&state=${state}"
+        String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
 
         assertAccessDenied(
             given()
@@ -291,7 +296,7 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
     def loginPageLocationMatcher() {
         return urlMatcher("${baseUrl}/oauth2/default/v1/authorize",
                 singleQueryValue("client_id", "OOICU812"),
-                singleQueryValue("redirect_uri", "http://localhost:${applicationPort}/authorization-code/callback"),
+                singleQueryValue("redirect_uri", "http://localhost:${applicationPort}${redirectUriPath}"),
                 singleQueryValue("response_type", "code"),
                 singleQueryValue("scope", "profile email openid"),
                 singleQueryValue("state", matchesPattern(".{6,}")))
@@ -303,7 +308,7 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
 
     @Override
     String getProtectedPath() {
-        return System.getProperty("redirect.path", super.getProtectedPath())
+        return Config.Global.getConfigProperty("redirect.path", super.getProtectedPath())
     }
 
     /*

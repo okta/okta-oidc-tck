@@ -16,7 +16,9 @@
 package com.okta.test.mock.scenarios
 
 import com.github.tomakehurst.wiremock.WireMockServer
+import com.okta.test.mock.Config
 
+import java.nio.charset.StandardCharsets
 import java.util.regex.Pattern
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*
@@ -25,6 +27,10 @@ class CodeRemoteValidationScenarioDefinition implements ScenarioDefinition {
 
     @Override
     void configureHttpMock(WireMockServer wireMockServer, String baseUrl) {
+
+        def redirectUriPath = Config.Global.codeFlowRedirectPath
+        def redirectUriPathEscaped = URLEncoder.encode(redirectUriPath, StandardCharsets.UTF_8.toString())
+
         wireMockServer.stubFor(
                 get("/oauth2/default/.well-known/openid-configuration")
                         .willReturn(aResponse()
@@ -35,7 +41,7 @@ class CodeRemoteValidationScenarioDefinition implements ScenarioDefinition {
         wireMockServer.stubFor(
                 get(urlPathEqualTo("/oauth2/default/v1/authorize"))
                         .withQueryParam("client_id", matching("OOICU812"))
-                        .withQueryParam("redirect_uri", matching(Pattern.quote("http://localhost:") + "\\d+/authorization-code/callback"))
+                        .withQueryParam("redirect_uri", matching(Pattern.quote("http://localhost:") + "\\d+${redirectUriPath}"))
                         .withQueryParam("response_type", matching("code"))
                         .withQueryParam("scope", matching("offline_access"))
                         .withQueryParam("state", matching(".{6,}"))
@@ -47,7 +53,7 @@ class CodeRemoteValidationScenarioDefinition implements ScenarioDefinition {
                 post(urlPathEqualTo("/oauth2/default/v1/token"))
                         .withRequestBody(containing("grant_type=authorization_code"))
                         .withRequestBody(containing("code=TEST_CODE&"))
-                        .withRequestBody(matching(".*" + Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" + Pattern.quote("%2Fauthorization-code%2Fcallback") + ".*"))
+                        .withRequestBody(matching(".*" + Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" + Pattern.quote(redirectUriPathEscaped) + ".*"))
                         .withBasicAuth("OOICU812", "VERY_SECRET")
                         .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json;charset=UTF-8")
@@ -65,7 +71,7 @@ class CodeRemoteValidationScenarioDefinition implements ScenarioDefinition {
                 post(urlPathEqualTo("/oauth2/default/v1/token"))
                         .withRequestBody(containing("grant_type=authorization_code"))
                         .withRequestBody(containing("code=TEST_CODE_WITH_GROUPS&"))
-                        .withRequestBody(matching(".*" + Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" + Pattern.quote("%2Fauthorization-code%2Fcallback") + ".*"))
+                        .withRequestBody(matching(".*" + Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" + Pattern.quote(redirectUriPathEscaped) + ".*"))
                         .withBasicAuth("OOICU812", "VERY_SECRET")
                         .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json;charset=UTF-8")

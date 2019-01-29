@@ -15,6 +15,7 @@
  */
 package com.okta.test.mock.tests
 
+import com.okta.test.mock.Config
 import com.okta.test.mock.Scenario
 import com.okta.test.mock.application.ApplicationTestRunner
 import com.okta.test.mock.wiremock.TestUtils
@@ -26,6 +27,8 @@ import org.hamcrest.Matcher
 import org.hamcrest.Matchers
 import org.testng.annotations.Test
 
+import java.nio.charset.StandardCharsets
+
 import static com.okta.test.mock.matchers.UrlMatcher.singleQueryValue
 import static com.okta.test.mock.matchers.UrlMatcher.urlMatcher
 import static com.okta.test.mock.scenarios.Scenario.CODE_FLOW_LOCAL_VALIDATION
@@ -35,6 +38,9 @@ import static org.hamcrest.text.MatchesPattern.matchesPattern
 
 @Scenario(CODE_FLOW_LOCAL_VALIDATION)
 class CodeFlowLocalValidationIT extends ApplicationTestRunner {
+
+    private def redirectUriPath = Config.Global.codeFlowRedirectPath
+
     @Test
     void redirectToLogin() {
 
@@ -46,7 +52,7 @@ class CodeFlowLocalValidationIT extends ApplicationTestRunner {
             .get("http://localhost:${applicationPort}/${protectedPath}")
         .then()
             .statusCode(302)
-            .header("Location", is("http://localhost:${applicationPort}/authorization-code/callback".toString()))
+            .header("Location", is("http://localhost:${applicationPort}${redirectUriPath}".toString()))
     }
 
     @Test
@@ -54,7 +60,7 @@ class CodeFlowLocalValidationIT extends ApplicationTestRunner {
 
         def locationMatcher = urlMatcher("${baseUrl}/oauth2/default/v1/authorize",
                 singleQueryValue("client_id", "OOICU812"),
-                singleQueryValue("redirect_uri", "http://localhost:${applicationPort}/authorization-code/callback"),
+                singleQueryValue("redirect_uri", "http://localhost:${applicationPort}${redirectUriPath}"),
                 singleQueryValue("response_type", "code"),
                 singleQueryValue("scope", "offline_access"),
                 singleQueryValue("state", matchesPattern(".{6,}")))
@@ -75,7 +81,7 @@ class CodeFlowLocalValidationIT extends ApplicationTestRunner {
         given()
             .accept(ContentType.JSON)
         .when()
-            .get("http://localhost:${applicationPort}/authorization-code/callback")
+            .get("http://localhost:${applicationPort}${redirectUriPath}")
         .then()
             .statusCode(200)
             .body(loginPageMatcher())
@@ -87,7 +93,7 @@ class CodeFlowLocalValidationIT extends ApplicationTestRunner {
         String redirectUrl = response.header("Location")
         String state = TestUtils.parseQuery(new URL(redirectUrl).query).get("state").get(0)
         String code = "TEST_CODE"
-        String requestUrl = "http://localhost:${applicationPort}/authorization-code/callback?code=${code}&state=${state}"
+        String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
 
         ExtractableResponse response2 = given()
             .accept(ContentType.JSON)
@@ -118,7 +124,7 @@ class CodeFlowLocalValidationIT extends ApplicationTestRunner {
         String redirectUrl = response.header("Location")
         String state = redirectUrl.substring(redirectUrl.lastIndexOf('=')+1) + "wrong"
         String code = "TEST_CODE"
-        String requestUrl = "http://localhost:${applicationPort}/authorization-code/callback?code=${code}&state=${state}"
+        String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
 
         ExtractableResponse response2 = given()
             .accept(ContentType.JSON)
@@ -137,7 +143,7 @@ class CodeFlowLocalValidationIT extends ApplicationTestRunner {
         ExtractableResponse response = redirectToRemoteLogin()
         String redirectUrl = response.header("Location")
         String state = redirectUrl.substring(redirectUrl.lastIndexOf('=')+1)
-        String requestUrl = "http://localhost:${applicationPort}/authorization-code/callback?state=${state}"
+        String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?state=${state}"
 
         given()
             .accept(ContentType.JSON)
@@ -156,7 +162,7 @@ class CodeFlowLocalValidationIT extends ApplicationTestRunner {
         String redirectUrl = response.header("Location")
         String state = redirectUrl.substring(redirectUrl.lastIndexOf('=')+1)
         String code = "TEST_CODE_invalidSignatureAccessTokenJwt"
-        String requestUrl = "http://localhost:${applicationPort}/authorization-code/callback?code=${code}&state=${state}"
+        String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
 
         given()
             .accept(ContentType.JSON)
@@ -175,7 +181,7 @@ class CodeFlowLocalValidationIT extends ApplicationTestRunner {
         String redirectUrl = response.header("Location")
         String state = redirectUrl.substring(redirectUrl.lastIndexOf('=')+1)
         String code = "TEST_CODE_wrongKeyIdAccessTokenJwt"
-        String requestUrl = "http://localhost:${applicationPort}/authorization-code/callback?code=${code}&state=${state}"
+        String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
 
         given()
             .accept(ContentType.JSON)
@@ -194,7 +200,7 @@ class CodeFlowLocalValidationIT extends ApplicationTestRunner {
         String redirectUrl = response.header("Location")
         String state = redirectUrl.substring(redirectUrl.lastIndexOf('=')+1)
         String code = "TEST_CODE_wrongScopeAccessTokenJwt"
-        String requestUrl = "http://localhost:${applicationPort}/authorization-code/callback?code=${code}&state=${state}"
+        String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
 
         ExtractableResponse response2 = given()
             .accept(ContentType.JSON)
@@ -225,7 +231,7 @@ class CodeFlowLocalValidationIT extends ApplicationTestRunner {
         String redirectUrl = response.header("Location")
         String state = redirectUrl.substring(redirectUrl.lastIndexOf('=')+1)
         String code = "TEST_CODE_wrongAudienceAccessTokenJwt"
-        String requestUrl = "http://localhost:${applicationPort}/authorization-code/callback?code=${code}&state=${state}"
+        String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
 
         given()
             .accept(ContentType.JSON)
@@ -250,7 +256,7 @@ class CodeFlowLocalValidationIT extends ApplicationTestRunner {
         if (shouldErrorsRedirectToLogin()) {
             return new ResponseSpecBuilder()
                     .expectStatusCode(302)
-                    .expectHeader("Location", is("http://localhost:${applicationPort}/authorization-code/callback".toString()))
+                    .expectHeader("Location", is("http://localhost:${applicationPort}${redirectUriPath}".toString()))
                     .build()
         } else {
             return new ResponseSpecBuilder()
