@@ -150,9 +150,10 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .claim("preferred_username", "jod.coder@example.com")
                 .setAudience("OOICU812")
                 .setIssuer(issuerUrl)
-                .setIssuedAt(Date.from(now))
-                .setNotBefore(Date.from(now))
-                .setExpiration(Date.from(now.minus(1, ChronoUnit.HOURS)))
+                .setIssuedAt(Date.from(now.minus(1, ChronoUnit.HOURS)))
+                .setNotBefore(Date.from(now.minus(1, ChronoUnit.HOURS)))
+                .setExpiration(Date.from(now.minus(30, ChronoUnit.MINUTES)))
+
                 .setHeader(Jwts.jwsHeader()
                 .setKeyId('TEST_PUB_KEY_ID'))
                 .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
