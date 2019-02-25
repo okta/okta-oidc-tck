@@ -74,4 +74,11 @@
         <cve>CVE-2018-19362</cve>
     </suppress>
 
+    <suppress>
+        <notes><![CDATA[
+        Wrong GAV, lots of XML libs have a false positive for processing. This project does NOT use processing ]]></notes>
+        <gav regex="true">^com\.sun\.xml\.bind:jaxb-impl:.*$</gav>
+        <cpe>cpe:/a:processing:processing</cpe>
+    </suppress>
+
 </suppressions>
