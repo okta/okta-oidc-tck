@@ -12,16 +12,12 @@
 
 'use strict';
 
-const platform = require('platform');
 const util = require('./util');
 
 class LoginHomePage {
 
   constructor() {
-    this.$loginButton = $('#login-button');
-
-    if(platform.os.family === 'Win32')
-      this.$loginButton = $('#loginButton');
+    this.$loginButton = element(by.linkText('Login'));
   }
 
   waitForPageLoad() {
