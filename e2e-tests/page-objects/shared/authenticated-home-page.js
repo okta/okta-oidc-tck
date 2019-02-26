@@ -12,20 +12,13 @@
 
 'use strict';
 
-const platform = require('platform');
 const util = require('./util');
 
 class AuthenticatedHomePage {
 
   constructor() {
-    this.$profileButton = $('#profile-button');
-    if(platform.os.family === 'Win32')
-      this.$profileButton = $('#profileButton');
-
-    this.$logoutButton = $('#logout-button');
-    if(platform.os.family === 'Win32')
-      this.$logoutButton = $('#logoutButton');
-
+    this.$profileButton = element(by.linkText('Profile'));
+    this.$logoutButton = element(by.linkText('Logout'));
     this.$messagesLink = element(by.partialLinkText('Messages'));
   }
 
