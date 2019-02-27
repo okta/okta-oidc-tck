@@ -40,6 +40,7 @@ keytool -genkey \
         -keysize 2048 \
         -validity 3650 \
         -dname "C=US; ST=Unknown; L=Springfield; O=Unknown; OU=Unknown; CN=localhost" \
+        -ext SAN=dns:localhost \
         -keypass password \
         -storepass password \
         -noprompt
