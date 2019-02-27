@@ -19,6 +19,7 @@ This project includes:
   Apache HttpClient under Apache License, Version 2.0
   Apache HttpClient Mime under Apache License, Version 2.0
   Apache HttpCore under Apache License, Version 2.0
+  BeanShell under Apache License, Version 2.0
   Hamcrest Core under New BSD License
   Hamcrest library under New BSD License
   Jackson-annotations under The Apache Software License, Version 2.0
@@ -28,7 +29,7 @@ This project includes:
   Java Hamcrest under BSD Licence 3
   JAXB OSGI under CDDL+GPL License
   JCL 1.2 implemented over SLF4J under MIT License
-  JCommander under The Apache Software License, Version 2.0
+  jcommander under Apache 2.0
   JSON Web Token support for the JVM under Apache License, Version 2.0
   json-path under Apache 2.0
   Logback Classic Module under Eclipse Public License - v 1.0 or GNU Lesser General Public License
@@ -39,7 +40,7 @@ This project includes:
   SLF4J API Module under MIT License
   SnakeYAML under Apache License, Version 2.0
   TagSoup under Apache License 2.0
-  testng under Apache  Version 2.0, January 2004
+  testng under Apache 2.0
   WireMock under The Apache Software License, Version 2.0
   xml-path under Apache 2.0
 
