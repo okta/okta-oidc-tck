@@ -38,6 +38,9 @@ class CliApplicationUnderTest implements ApplicationUnderTest {
             .redirectErrorStream(true)
             .redirectOutput(logFile)
 
+        // working directory (defaults to ".")
+        processBuilder.directory(new File(testScenario.workingDirectory))
+
         // add any new env vars
         processBuilder.environment().putAll(testScenario.env)
 
