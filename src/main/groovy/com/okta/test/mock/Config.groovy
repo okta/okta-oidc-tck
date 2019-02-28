@@ -38,6 +38,7 @@ class TestScenario {
      * A protected path that will force a redirect or an access error.
      */
     String protectedPath = "/"
+    String workingDirectory = "."
     Map<String, String> env = new HashMap<>()
     List<String> args = new ArrayList<>()
     Map<String, Integer> ports = new HashMap<>()
