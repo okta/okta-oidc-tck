@@ -17,8 +17,16 @@ const util = require('./util');
 class AuthenticatedHomePage {
 
   constructor() {
-    this.$profileButton = element(by.linkText('Profile'));
-    this.$logoutButton = element(by.linkText('Logout'));
+    this.$profileButton = $('#profile-button');
+    this.$logoutButton = $('#logout-button');
+
+    // For asp.net webforms you can't have ids with hyphens
+    // https://stackoverflow.com/questions/25919471/how-to-get-html-control-by-id-that-has-hyphens
+  	if (__dirname.indexOf('samples-aspnet-webforms') > -1) {
+      this.$profileButton = $('#profileButton');
+      this.$logoutButton = $('#logoutButton');
+    }
+
     this.$messagesLink = element(by.partialLinkText('Messages'));
   }
 
