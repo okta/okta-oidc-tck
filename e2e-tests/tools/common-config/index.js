@@ -75,11 +75,11 @@ commonConfig.configure = function (promises) {
   else if (process.env.CHROME_HEADLESS || process.env.TRAVIS) {
     console.log('-- Using Chrome Headless --');
     config.capabilities.chromeOptions = {
-      args: ['--headless','--disable-gpu','--window-size=1600x1200']
+      args: ['--headless','--disable-gpu','--window-size=1600x1200', '--disable-browser-side-navigation']
     };
 
     // work around for chrome crashes on Travis-CI
-    if (process.env.TRAVIS) {
+    if (process.env.TRAVIS || process.env.NO_SANDBOX) {
       config.capabilities.chromeOptions.args.push('--no-sandbox');
     }
   }
