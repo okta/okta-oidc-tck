@@ -50,6 +50,9 @@ commonConfig.configure = function (promises) {
       }));
     },
     afterLaunch() {
+      if (promises == null)
+        return;
+
       promises.then((childProcesses) => {
         childProcesses.forEach(child => child.stop());
       });
