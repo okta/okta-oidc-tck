@@ -97,6 +97,11 @@ function startAndWait(opts) {
 }
 
 async function killProcessAtPort(port) {
+  // If server was started manually, we don't need to kill the server
+  if (process.env.SERVER_STARTED === 'true') {
+    return;
+  }
+
   // For aspnet webforms samples, we use iisexpress that is started as system process
   // Using port to kill it doesn't work. Hence killing the process through name
   const iisexpress = await find('name', 'iisexpress.exe');
