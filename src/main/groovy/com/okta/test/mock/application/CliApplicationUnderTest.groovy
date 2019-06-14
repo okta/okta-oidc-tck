@@ -31,12 +31,24 @@ class CliApplicationUnderTest implements ApplicationUnderTest {
     void start() {
         String[] command = [testScenario.command] + testScenario.args
 
-        File logFile = new File("target", "${testScenario.command}-${new Date().format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone("UTC"))}" )
-        logger.info("Starting process: ${command}, logging to file: ${logFile}")
-
         def processBuilder = new ProcessBuilder(command)
-            .redirectErrorStream(true)
-            .redirectOutput(logFile)
+
+        def useLogFileEnv = System.getenv("TCK_USE_LOG_FILE")
+        boolean useLogFile = useLogFileEnv == null ? true : Boolean.parseBoolean(useLogFileEnv)
+
+        println("useLogFile: ${useLogFileEnv} - ${useLogFile}")
+
+        if (useLogFile) {
+            File logFile = new File("target", "${testScenario.command}-${new Date().format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone("UTC"))}" )
+            logger.info("Starting process: ${command}, logging to file: ${logFile}")
+
+            processBuilder.redirectErrorStream(true)
+            processBuilder.redirectOutput(logFile)
+        } else {
+            logger.info("Starting process: ${command}")
+
+            processBuilder.inheritIO()
+        }
 
         // working directory (defaults to ".")
         processBuilder.directory(new File(testScenario.workingDirectory))
