@@ -30,10 +30,9 @@
         wiremock-standalone contains an old repackaged version of Jetty which contains the
         following CVEs, wiremock is pinned to this version. This repackaged Jetty is used for test structures ONLY
         so we can safely ignore them ]]></notes>
-        <cve>CVE-2017-7656</cve>
-        <cve>CVE-2017-7657</cve>
-        <cve>CVE-2017-7658</cve>
         <cve>CVE-2017-9735</cve>
+        <cve>CVE-2019-10241</cve>
+        <cve>CVE-2019-10247</cve>
     </suppress>
 
     <suppress>
@@ -48,7 +47,7 @@
 
     <suppress>
         <notes><![CDATA[
-        file name: wiremock-standalone-2.20.0.jar/META-INF/maven/com.google.guava/guava/pom.xml
+        file name: wiremock-standalone-2.23.2.jar/META-INF/maven/com.google.guava/guava/pom.xml
 
         Unbounded memory allocation - Ignore for the context of testing, as HTTP requests are controlled and wiremock
         starts/stops a server for test usage only.]]></notes>
@@ -65,13 +64,6 @@
         integration tests so we can ignore these.  NOTE: this dependency is ONLY used for a test scope and will NOT
         cause downstream dependencies to use this version of Jackson. ]]></notes>
         <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:.*$</gav>
-        <cve>CVE-2018-1000873</cve>
-        <cve>CVE-2018-14719</cve>
-        <cve>CVE-2018-14720</cve>
-        <cve>CVE-2018-14721</cve>
-        <cve>CVE-2018-19360</cve>
-        <cve>CVE-2018-19361</cve>
-        <cve>CVE-2018-19362</cve>
         <cve>CVE-2019-12086</cve>
     </suppress>
 
