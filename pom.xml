@@ -26,7 +26,7 @@
 
     <groupId>com.okta.oidc.tck</groupId>
     <artifactId>okta-oidc-tck</artifactId>
-    <version>0.5.3</version>
+    <version>0.5.4-SNAPSHOT</version>
 
     <name>Okta OIDC TCK</name>
 
@@ -221,8 +221,4 @@
             </plugin>
         </plugins>
     </build>
-
-  <scm>
-    <tag>okta-oidc-tck-0.5.3</tag>
-  </scm>
 </project>
