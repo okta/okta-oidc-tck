@@ -33,6 +33,7 @@ import org.testng.annotations.AfterClass
 
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
+import java.util.function.Function
 
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import static java.lang.Thread.currentThread
@@ -168,7 +169,17 @@ class GStringTransformer extends ResponseTransformer {
         // merge bindings
         bindings.forEach {params += it}
         // override binds with params if any
-        if (parameters != null) params += parameters
+        if (parameters != null) {
+            params += parameters
+
+            // check if any of the params are functions, if so run them and get the result
+            params.entrySet().each {
+                def value = it.getValue()
+                if (value instanceof Function) {
+                    it.setValue(value.apply(request))
+                }
+            }
+        }
 
         return Response.Builder
                 .like(response)
