@@ -19,6 +19,7 @@ import com.okta.test.mock.Config
 import com.okta.test.mock.Scenario
 import com.okta.test.mock.application.ApplicationTestRunner
 import com.okta.test.mock.matchers.TckMatchers
+import com.okta.test.mock.scenarios.NonceHolder
 import com.okta.test.mock.wiremock.TestUtils
 import io.restassured.http.ContentType
 import io.restassured.response.ExtractableResponse
@@ -74,6 +75,7 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String redirectUrl = response.header("Location")
         String state = getState(redirectUrl)
         String code = "TEST_CODE"
+        setNonce(redirectUrl, code)
         String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
 
         ExtractableResponse initialResponse = given()
@@ -138,6 +140,7 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String redirectUrl = response.header("Location")
         String state = getState(redirectUrl)
         String code = "TEST_CODE_invalidSignatureIdTokenJwt"
+        setNonce(redirectUrl, code)
         String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
 
         assertAccessDenied(
@@ -158,6 +161,7 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String redirectUrl = response.header("Location")
         String state = getState(redirectUrl)
         String code = "TEST_CODE_wrongKeyIdIdTokenJwt"
+        setNonce(redirectUrl, code)
         String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
 
         assertAccessDenied(
@@ -178,6 +182,7 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String redirectUrl = response.header("Location")
         String state = getState(redirectUrl)
         String code = "TEST_CODE_issuedInFutureIdTokenJwt"
+        setNonce(redirectUrl, code)
         String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
 
         assertAccessDenied(
@@ -198,6 +203,7 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String redirectUrl = response.header("Location")
         String state = getState(redirectUrl)
         String code = "TEST_CODE_expiredIdTokenJwt"
+        setNonce(redirectUrl, code)
         String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
 
         assertAccessDenied(
@@ -218,6 +224,7 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String redirectUrl = response.header("Location")
         String state = getState(redirectUrl)
         String code = "TEST_CODE_wrongAudienceIdTokenJwt"
+        setNonce(redirectUrl, code)
         String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
 
         assertAccessDenied(
@@ -238,6 +245,7 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String redirectUrl = response.header("Location")
         String state = getState(redirectUrl)
         String code = "TEST_CODE_invalidIssuerIdTokenJwt"
+        setNonce(redirectUrl, code)
         String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
 
         assertAccessDenied(
@@ -258,6 +266,7 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String redirectUrl = response.header("Location")
         String state = getState(redirectUrl)
         String code = "TEST_CODE_invalidNotBeforeIdTokenJwt"
+        setNonce(redirectUrl, code)
         String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
 
         assertAccessDenied(given()
@@ -277,6 +286,7 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String redirectUrl = response.header("Location")
         String state = getState(redirectUrl)
         String code = "TEST_CODE_unsignedIdTokenJwt"
+        setNonce(redirectUrl, code)
         String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
 
         assertAccessDenied(
@@ -292,7 +302,20 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
     }
 
     private String getState(String redirectUrl) {
-        return TestUtils.parseQuery(new URL(redirectUrl).query).get("state")[0]
+        return getQueryParamValue(redirectUrl, "state")
+    }
+
+    private String getNonce(String redirectUrl) {
+        return getQueryParamValue(redirectUrl, "nonce")
+    }
+
+    private void setNonce(String redirectUrl, String key) {
+        String nonce = getNonce(redirectUrl)
+        NonceHolder.setNonce(key, nonce)
+    }
+
+    private String getQueryParamValue(String redirectUrl, String paramName) {
+        return TestUtils.parseQuery(new URL(redirectUrl).query).get(paramName)[0]
     }
 
     protected Matcher<?> loginPageMatcher() {

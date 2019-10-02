@@ -16,8 +16,10 @@
 package com.okta.test.mock.scenarios
 
 import com.github.tomakehurst.wiremock.WireMockServer
+import com.github.tomakehurst.wiremock.http.Request
 import com.okta.test.mock.Config
 import com.okta.test.mock.wiremock.TestUtils
+import io.jsonwebtoken.JwtBuilder
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import org.apache.commons.codec.binary.Base64
@@ -27,6 +29,7 @@ import java.security.KeyPair
 import java.security.KeyPairGenerator
 import java.time.Instant
 import java.time.temporal.ChronoUnit
+import java.util.function.Function
 import java.util.regex.Pattern
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse
@@ -43,15 +46,15 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
     String pubKeyE
     String pubKeyN
     String accessTokenJwt
-    String idTokenJwt
-    String wrongKeyIdIdTokenJwt
-    String wrongAudienceIdTokenJwt
-    String issuedInFutureIdTokenJwt
-    String expiredIdTokenJwt
-    String invalidSignatureIdTokenJwt
-    String invalidIssuerIdTokenJwt
-    String invalidNotBeforeIdTokenJwt
-    String unsignedIdTokenJwt
+    JwtBuilder idTokenJwtBuilder
+    JwtBuilder wrongKeyIdIdTokenJwtBuilder
+    JwtBuilder wrongAudienceIdTokenJwtBuilder
+    JwtBuilder issuedInFutureIdTokenJwtBuilder
+    JwtBuilder expiredIdTokenJwtBuilder
+    JwtBuilder invalidSignatureIdTokenJwtBuilder
+    JwtBuilder invalidIssuerIdTokenJwtBuilder
+    JwtBuilder invalidNotBeforeIdTokenJwtBuilder
+    JwtBuilder unsignedIdTokenJwtBuilder
     String clientId = "OOICU812"
     String clientSecret = "VERY_SECRET"
     String authHeader = "Basic " + "${clientId}:${clientSecret}".bytes.encodeBase64().toString()
@@ -83,7 +86,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
                 .compact()
 
-        idTokenJwt =  Jwts.builder()
+        idTokenJwtBuilder =  Jwts.builder()
                 .setSubject("00uid4BxXw6I6TV4m0g3")
                 .claim("name", "Joe Coder")
                 .claim("email", "joe.coder@example.com")
@@ -96,9 +99,8 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .setHeader(Jwts.jwsHeader()
                 .setKeyId('TEST_PUB_KEY_ID'))
                 .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
-                .compact()
 
-        wrongKeyIdIdTokenJwt =  Jwts.builder()
+        wrongKeyIdIdTokenJwtBuilder =  Jwts.builder()
                 .setSubject("00uid4BxXw6I6TV4m0g3")
                 .claim("name", "Joe Coder")
                 .claim("email", "joe.coder@example.com")
@@ -111,9 +113,8 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .setHeader(Jwts.jwsHeader()
                 .setKeyId('WRONG_TEST_PUB_KEY_ID'))
                 .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
-                .compact()
 
-        wrongAudienceIdTokenJwt =  Jwts.builder()
+        wrongAudienceIdTokenJwtBuilder =  Jwts.builder()
                 .setSubject("00uid4BxXw6I6TV4m0g3")
                 .claim("name", "Joe Coder")
                 .claim("email", "joe.coder@example.com")
@@ -126,9 +127,8 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .setHeader(Jwts.jwsHeader()
                 .setKeyId('TEST_PUB_KEY_ID'))
                 .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
-                .compact()
 
-        issuedInFutureIdTokenJwt =  Jwts.builder()
+        issuedInFutureIdTokenJwtBuilder =  Jwts.builder()
                 .setSubject("00uid4BxXw6I6TV4m0g3")
                 .claim("name", "Joe Coder")
                 .claim("email", "joe.coder@example.com")
@@ -141,9 +141,8 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .setHeader(Jwts.jwsHeader()
                 .setKeyId('TEST_PUB_KEY_ID'))
                 .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
-                .compact()
 
-        expiredIdTokenJwt =  Jwts.builder()
+        expiredIdTokenJwtBuilder =  Jwts.builder()
                 .setSubject("00uid4BxXw6I6TV4m0g3")
                 .claim("name", "Joe Coder")
                 .claim("email", "joe.coder@example.com")
@@ -157,9 +156,8 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .setHeader(Jwts.jwsHeader()
                 .setKeyId('TEST_PUB_KEY_ID'))
                 .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
-                .compact()
 
-        invalidSignatureIdTokenJwt =  Jwts.builder()
+        invalidSignatureIdTokenJwtBuilder =  Jwts.builder()
                 .setSubject("00uid4BxXw6I6TV4m0g3")
                 .claim("name", "Joe Coder")
                 .claim("email", "joe.coder@example.com")
@@ -172,9 +170,8 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .setHeader(Jwts.jwsHeader()
                 .setKeyId('TEST_PUB_KEY_ID'))
                 .signWith(SignatureAlgorithm.RS256, invalidKeyPair.privateKey)
-                .compact()
 
-        invalidIssuerIdTokenJwt =  Jwts.builder()
+        invalidIssuerIdTokenJwtBuilder =  Jwts.builder()
                 .setSubject("00uid4BxXw6I6TV4m0g3")
                 .claim("name", "Joe Coder")
                 .claim("email", "joe.coder@example.com")
@@ -187,9 +184,8 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .setHeader(Jwts.jwsHeader()
                 .setKeyId('TEST_PUB_KEY_ID'))
                 .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
-                .compact()
 
-        invalidNotBeforeIdTokenJwt =  Jwts.builder()
+        invalidNotBeforeIdTokenJwtBuilder =  Jwts.builder()
                 .setSubject("00uid4BxXw6I6TV4m0g3")
                 .claim("name", "Joe Coder")
                 .claim("email", "joe.coder@example.com")
@@ -202,9 +198,8 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .setHeader(Jwts.jwsHeader()
                 .setKeyId('TEST_PUB_KEY_ID'))
                 .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
-                .compact()
 
-        unsignedIdTokenJwt =  Jwts.builder()
+        unsignedIdTokenJwtBuilder =  Jwts.builder()
                 .setSubject("00uid4BxXw6I6TV4m0g3")
                 .claim("name", "Joe Coder")
                 .claim("email", "joe.coder@example.com")
@@ -216,7 +211,6 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
                 .setHeader(Jwts.jwsHeader()
                 .setKeyId('TEST_PUB_KEY_ID'))
-                .compact()
     }
 
     @Override
@@ -231,7 +225,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 accessTokenJwt: accessTokenJwt,
                 pubKeyE: pubKeyE,
                 pubKeyN: pubKeyN,
-                idTokenJwt: idTokenJwt
+                idTokenJwt: idTokenJwtBuilder.compact()
         ])
 
         wireMockServer.stubFor(
@@ -250,7 +244,6 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                         .withQueryParam("state", matching(".{6,}"))
                         .willReturn(aResponse()
                         .withBody("<html>fake_login_page<html/>")))
-
         wireMockServer.stubFor(
                 post(urlPathEqualTo("/oauth2/default/v1/token"))
                         .withHeader("Authorization", equalTo(authHeader))
@@ -258,9 +251,9 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                         .withRequestBody(containing("code=TEST_CODE&"))
                         .withRequestBody(matching(".*"+Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" +Pattern.quote(redirectUriPathEscaped) +".*"))
                         .willReturn(aResponse()
-                        .withHeader("Content-Type", "application/json;charset=UTF-8")
-                        .withBodyFile("token.json")
-                        .withTransformer("gstring-template", "idTokenJwt", idTokenJwt)))
+                                .withHeader("Content-Type", "application/json;charset=UTF-8")
+                                .withBodyFile("token.json")
+                                .withTransformer("gstring-template", "idTokenJwt", new JwtWithNonce("TEST_CODE", idTokenJwtBuilder))))
 
         wireMockServer.stubFor(
                 post(urlPathEqualTo("/oauth2/default/v1/token"))
@@ -271,7 +264,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                         .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json;charset=UTF-8")
                         .withBodyFile("token.json")
-                        .withTransformer("gstring-template", "idTokenJwt", wrongKeyIdIdTokenJwt)))
+                        .withTransformer("gstring-template", "idTokenJwt", new JwtWithNonce("TEST_CODE_wrongKeyIdIdTokenJwt", wrongKeyIdIdTokenJwtBuilder))))
 
         wireMockServer.stubFor(
                 post(urlPathEqualTo("/oauth2/default/v1/token"))
@@ -282,7 +275,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                         .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json;charset=UTF-8")
                         .withBodyFile("token.json")
-                        .withTransformer("gstring-template", "idTokenJwt", invalidSignatureIdTokenJwt)))
+                        .withTransformer("gstring-template", "idTokenJwt", new JwtWithNonce("TEST_CODE_invalidSignatureIdTokenJwt", invalidSignatureIdTokenJwtBuilder))))
 
         wireMockServer.stubFor(
                 post(urlPathEqualTo("/oauth2/default/v1/token"))
@@ -293,7 +286,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                         .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json;charset=UTF-8")
                         .withBodyFile("token.json")
-                        .withTransformer("gstring-template", "idTokenJwt", invalidIssuerIdTokenJwt)))
+                        .withTransformer("gstring-template", "idTokenJwt", new JwtWithNonce("TEST_CODE_invalidIssuerIdTokenJwt", invalidIssuerIdTokenJwtBuilder))))
 
         wireMockServer.stubFor(
                 post(urlPathEqualTo("/oauth2/default/v1/token"))
@@ -304,7 +297,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                         .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json;charset=UTF-8")
                         .withBodyFile("token.json")
-                        .withTransformer("gstring-template", "idTokenJwt", issuedInFutureIdTokenJwt)))
+                        .withTransformer("gstring-template", "idTokenJwt", new JwtWithNonce("TEST_CODE_issuedInFutureIdTokenJwt", issuedInFutureIdTokenJwtBuilder))))
 
         wireMockServer.stubFor(
                 post(urlPathEqualTo("/oauth2/default/v1/token"))
@@ -315,7 +308,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                         .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json;charset=UTF-8")
                         .withBodyFile("token.json")
-                        .withTransformer("gstring-template", "idTokenJwt", expiredIdTokenJwt)))
+                        .withTransformer("gstring-template", "idTokenJwt", new JwtWithNonce("TEST_CODE_expiredIdTokenJwt", expiredIdTokenJwtBuilder))))
 
         wireMockServer.stubFor(
                 post(urlPathEqualTo("/oauth2/default/v1/token"))
@@ -326,7 +319,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                         .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json;charset=UTF-8")
                         .withBodyFile("token.json")
-                        .withTransformer("gstring-template", "idTokenJwt", wrongAudienceIdTokenJwt)))
+                        .withTransformer("gstring-template", "idTokenJwt", new JwtWithNonce("TEST_CODE_wrongAudienceIdTokenJwt", wrongAudienceIdTokenJwtBuilder))))
 
         wireMockServer.stubFor(
                 post(urlPathEqualTo("/oauth2/default/v1/token"))
@@ -337,7 +330,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                         .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json;charset=UTF-8")
                         .withBodyFile("token.json")
-                        .withTransformer("gstring-template", "idTokenJwt", invalidNotBeforeIdTokenJwt)))
+                        .withTransformer("gstring-template", "idTokenJwt", new JwtWithNonce("TEST_CODE_invalidNotBeforeIdTokenJwt", invalidNotBeforeIdTokenJwtBuilder))))
 
         wireMockServer.stubFor(
                 post(urlPathEqualTo("/oauth2/default/v1/token"))
@@ -348,7 +341,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                         .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json;charset=UTF-8")
                         .withBodyFile("token.json")
-                        .withTransformer("gstring-template", "idTokenJwt", unsignedIdTokenJwt)))
+                        .withTransformer("gstring-template", "idTokenJwt", new JwtWithNonce("TEST_CODE_unsignedIdTokenJwt", unsignedIdTokenJwtBuilder))))
 
         wireMockServer.stubFor(
                 get(urlPathEqualTo("/oauth2/default/v1/keys"))
@@ -363,5 +356,22 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                         .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json;charset=UTF-8")
                         .withBodyFile("userinfo.json")))
+    }
+
+    private class JwtWithNonce implements Function<Request, String> {
+
+        private final String nonceKey
+        private final JwtBuilder jwtBuilder
+
+        JwtWithNonce(String nonceKey, JwtBuilder jwtBuilder) {
+            this.nonceKey = nonceKey
+            this.jwtBuilder = jwtBuilder
+        }
+
+        @Override
+        String apply(Request request) {
+            String nonce = NonceHolder.getNonce(nonceKey)
+            return jwtBuilder.claim("nonce", nonce).compact()
+        }
     }
 }
