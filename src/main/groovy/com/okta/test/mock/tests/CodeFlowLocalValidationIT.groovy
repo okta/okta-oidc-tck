@@ -209,7 +209,7 @@ class CodeFlowLocalValidationIT extends ApplicationTestRunner {
                .follow(false)
         .when()
             .get(requestUrl)
-        .then().log().everything()
+        .then()
             .statusCode(302)
             .header("Location", Matchers.equalTo("http://localhost:${applicationPort}/".toString()))
         .extract()
@@ -221,7 +221,7 @@ class CodeFlowLocalValidationIT extends ApplicationTestRunner {
                 .follow(false)
         .when()
             .get("http://localhost:${applicationPort}/")
-        .then().log().everything()
+        .then()
             .spec(statusCodeMatcher(403))
     }
 

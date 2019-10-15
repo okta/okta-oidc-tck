@@ -122,14 +122,8 @@ abstract class ApplicationTestRunner extends HttpMock implements IHookable {
     }
 
     ApplicationUnderTest getApplicationUnderTest(String scenarioName) {
-        Config config
 
-        if (System.getProperty("config") != null) {
-            File yamlFile = new File(System.getProperty("config"))
-            config = new Yaml().loadAs(new FileInputStream(yamlFile), Config)
-        } else {
-            config = new Yaml().loadAs(getClass().getResource( '/testRunner.yml' ).text, Config)
-        }
+        Config config = loadConfig()
 
         Class impl = Class.forName(config.implementation)
         scenario = config.scenarios.get(scenarioName)
@@ -170,5 +164,36 @@ abstract class ApplicationTestRunner extends HttpMock implements IHookable {
     int getFreePort() {
         int port = new ServerSocket(0).withCloseable {it.getLocalPort()}
         return port
+    }
+
+    /**
+     * Add some verbose logging (when needed). References to this method should NOT be checked in.
+     */
+    void dump() {
+        println "\nDump:"
+        if (wireMockServer != null) {
+            wireMockServer.getAllServeEvents().each {
+                println(it.getRequest())
+            }
+        }
+    }
+
+    Config loadConfig(String fallbackConfigLocation = configYamlLocation()) {
+        Config config
+        if (System.getProperty("config") != null) {
+            File yamlFile = new File(System.getProperty("config"))
+            config = new Yaml().loadAs(new FileInputStream(yamlFile), Config)
+        } else {
+            config = new Yaml().loadAs(getClass().getResource( fallbackConfigLocation ).text, Config)
+        }
+        return config
+    }
+
+    /**
+     * Returns the location of the configuration yaml file on the classpath.
+     * @return defaults to '/testRunner.yml'
+     */
+    String configYamlLocation() {
+        return '/testRunner.yml'
     }
 }

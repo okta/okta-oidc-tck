@@ -1,0 +1,19 @@
+{
+    "active": true,
+    "scope": "openid email profile",
+    "username": "joe.coder@example.com",
+    "exp": 1570145925,
+    "iat": 1570142325,
+    "sub": "joe.coder@example.com",
+    "aud": "api://default",
+    "iss": "http://example.com/issuer",
+    "jti": "a-test-jti",
+    "token_type": "Bearer",
+    "client_id": "OOICU812",
+    "uid": "00uid4BxXw6I6TV4m0g3",
+    "email": "joe.coder@example.com",
+        "groups": [
+        "Everyone",
+        "Test-Group"
+    ]
+}

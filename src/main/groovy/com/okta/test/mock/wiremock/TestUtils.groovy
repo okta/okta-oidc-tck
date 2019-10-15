@@ -17,6 +17,8 @@ package com.okta.test.mock.wiremock
 
 import io.restassured.config.HttpClientConfig
 import io.restassured.config.RestAssuredConfig
+import io.restassured.filter.Filter
+import io.restassured.filter.session.SessionFilter
 import io.restassured.http.ContentType
 import io.restassured.matcher.ResponseAwareMatcher
 import io.restassured.response.ExtractableResponse
@@ -59,7 +61,8 @@ class TestUtils {
     static ExtractableResponse followRedirectUntilLocation(ExtractableResponse response,
                                                            Matcher<Response> responseMatcher,
                                                            int maxRedirects = 3,
-                                                           String baseUrl = "") {
+                                                           String baseUrl = "",
+                                                           Filter filter = new SessionFilter()) {
 
         if (responseMatcher.matches(response)) {
             return response
@@ -80,15 +83,15 @@ class TestUtils {
                 .redirects()
                     .follow(false)
                 .accept(ContentType.JSON)
+                .filter(filter)
             .when()
                 .cookies(response.cookies())
                 .get(location)
             .then()
                 .extract()
 
-            response = tempResponse
-            if (responseMatcher.matches(response)) {
-                return response
+            if (responseMatcher.matches(tempResponse)) {
+                return tempResponse
             }
         }
         assertThat "Exceded max redirect follow of '${maxRedirects}' last location failure: ", response.header("Location"), responseMatcher

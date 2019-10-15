@@ -21,19 +21,29 @@ import com.okta.test.mock.application.ApplicationTestRunner
 import com.okta.test.mock.matchers.TckMatchers
 import com.okta.test.mock.scenarios.NonceHolder
 import com.okta.test.mock.wiremock.TestUtils
+import io.restassured.filter.Filter
+import io.restassured.filter.cookie.CookieFilter
+import io.restassured.filter.session.SessionFilter
 import io.restassured.http.ContentType
 import io.restassured.response.ExtractableResponse
 import io.restassured.response.Response
 import org.hamcrest.Matcher
+import org.hamcrest.MatcherAssert
 import org.hamcrest.Matchers
 import org.testng.annotations.Test
 
 import static com.okta.test.mock.matchers.UrlMatcher.singleQueryValue
 import static com.okta.test.mock.matchers.UrlMatcher.urlMatcher
 import static io.restassured.RestAssured.given
+import static io.restassured.RestAssured.post
 import static org.hamcrest.Matchers.allOf
 import static org.hamcrest.Matchers.anyOf
 import static org.hamcrest.Matchers.containsString
+import static org.hamcrest.Matchers.either
+import static org.hamcrest.Matchers.is
+import static org.hamcrest.Matchers.isOneOf
+import static org.hamcrest.Matchers.not
+import static org.hamcrest.Matchers.nullValue
 import static org.hamcrest.text.MatchesPattern.matchesPattern
 import static com.okta.test.mock.scenarios.Scenario.OIDC_CODE_FLOW_LOCAL_VALIDATION
 import static com.okta.test.mock.wiremock.TestUtils.followRedirectUntilLocation
@@ -71,28 +81,47 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
 
     @Test
     void respondWithCode() {
-        ExtractableResponse response = redirectToRemoteLogin()
-        String redirectUrl = response.header("Location")
-        String state = getState(redirectUrl)
-        String code = "TEST_CODE"
-        setNonce(redirectUrl, code)
-        String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
+        doLogin()
+    }
 
-        ExtractableResponse initialResponse = given()
-                .redirects()
-                    .follow(false)
-                .accept(ContentType.JSON)
-                .cookies(response.cookies())
-            .when().log().everything()
-                .get(requestUrl)
-            .then()
-                .extract()
+    @Test
+    void rpInitiatedLogoutTest() {
+        Filter filter = new CookieFilter()
+        doLogin(filter)
 
-        followRedirectUntilLocation(initialResponse,
-                                    allOf(TckMatchers.responseCode(200),
-                                          TckMatchers.bodyMatcher(containsString("Welcome home"))),
-                                    3,
-                                    "http://localhost:${applicationPort}")
+        // make sure these cookies are good (it's easy to mix up the cookies between the mock server and the app server)
+         given()
+            .redirects()
+                .follow(false)
+            .accept(ContentType.JSON)
+            .filter(filter)
+        .when()
+            .get("http://localhost:${applicationPort}/")
+        .then()
+            .body(containsString("Welcome home"))
+        .extract()
+
+        // then trigger a logout: POST /logout
+        given()
+            .redirects()
+                .follow(false)
+            .filter(filter)
+        .when()
+            .post("http://localhost:${applicationPort}/logout")
+        .then()
+            .statusCode(302) // logout should redirect somewhere
+
+        // TODO: there should probably be a back channel request in here, but for now this is what Spring supports
+
+         given()
+            .redirects()
+                .follow(false)
+            .accept(ContentType.JSON)
+            .filter(filter)
+        .when()
+            .get("http://localhost:${applicationPort}/")
+        .then()
+            .statusCode(isOneOf(302, 401)) // work around for Spring Reactive returning a 401 with a bad cookie
     }
 
     @Test
@@ -301,6 +330,33 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
                 .extract())
     }
 
+    ExtractableResponse doLogin(Filter filter = new CookieFilter()) {
+        ExtractableResponse response = redirectToRemoteLogin()
+        String redirectUrl = response.header("Location")
+        String state = getState(redirectUrl)
+        String code = "TEST_CODE"
+        setNonce(redirectUrl, code)
+        String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
+
+        ExtractableResponse initialResponse = given()
+                .filter(filter)
+                .redirects()
+                    .follow(false)
+                .accept(ContentType.JSON)
+                .cookies(response.cookies())
+            .when()
+                .get(requestUrl)
+            .then()
+                .extract()
+
+        return followRedirectUntilLocation(initialResponse,
+                                    allOf(TckMatchers.responseCode(200),
+                                          TckMatchers.bodyMatcher(containsString("Welcome home"))),
+                                    3,
+                                    "http://localhost:${applicationPort}",
+                                    filter)
+    }
+
     private String getState(String redirectUrl) {
         return getQueryParamValue(redirectUrl, "state")
     }
@@ -315,7 +371,8 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
     }
 
     private String getQueryParamValue(String redirectUrl, String paramName) {
-        return TestUtils.parseQuery(new URL(redirectUrl).query).get(paramName)[0]
+        def value = TestUtils.parseQuery(new URL(redirectUrl).query).get(paramName)
+        return value != null ? value[0] : null
     }
 
     protected Matcher<?> loginPageMatcher() {
