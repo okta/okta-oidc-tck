@@ -371,7 +371,10 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
         @Override
         String apply(Request request) {
             String nonce = NonceHolder.getNonce(nonceKey)
-            return jwtBuilder.claim("nonce", nonce).compact()
+            if (nonce != null) {
+                jwtBuilder.claim("nonce", nonce)
+            }
+            return jwtBuilder.compact()
         }
     }
 }

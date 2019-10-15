@@ -17,6 +17,7 @@ package com.okta.test.mock.scenarios
 
 enum Scenario {
     CODE_FLOW_LOCAL_VALIDATION("code-flow-local-validation", new CodeLocalValidationScenarioDefinition()),
+    PKCE_CODE_FLOW_REMOTE_VALIDATION("pkce-code-flow-remote-validation", new PkceCodeRemoteValidationScenarioDefinition()),
     CODE_FLOW_REMOTE_VALIDATION("code-flow-remote-validation", new CodeRemoteValidationScenarioDefinition()),
     CUSTOM_CODE_FLOW_LOCAL_VALIDATION("custom-code-flow-local-validation", new CodeLocalValidationScenarioDefinition()),
     CUSTOM_CODE_FLOW_REMOTE_VALIDATION("custom-code-flow-remote-validation", new CodeRemoteValidationScenarioDefinition()),
@@ -27,6 +28,7 @@ enum Scenario {
     static Map<String, Scenario> LOOKUP_MAP = new HashMap<>()
     static {
         LOOKUP_MAP.put( CODE_FLOW_LOCAL_VALIDATION.id, CODE_FLOW_LOCAL_VALIDATION)
+        LOOKUP_MAP.put( PKCE_CODE_FLOW_REMOTE_VALIDATION.id, PKCE_CODE_FLOW_REMOTE_VALIDATION)
         LOOKUP_MAP.put( CODE_FLOW_REMOTE_VALIDATION.id, CODE_FLOW_REMOTE_VALIDATION)
         LOOKUP_MAP.put( CUSTOM_CODE_FLOW_LOCAL_VALIDATION.id, CUSTOM_CODE_FLOW_LOCAL_VALIDATION)
         LOOKUP_MAP.put( CUSTOM_CODE_FLOW_REMOTE_VALIDATION.id, CUSTOM_CODE_FLOW_REMOTE_VALIDATION)
