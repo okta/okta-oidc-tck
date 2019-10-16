@@ -64,13 +64,8 @@
         integration tests so we can ignore these.  NOTE: this dependency is ONLY used for a test scope and will NOT
         cause downstream dependencies to use this version of Jackson. ]]></notes>
         <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:.*$</gav>
-        <cve>CVE-2019-12384</cve>
-        <cve>CVE-2019-12086</cve>
-        <cve>CVE-2019-12814</cve>
-        <cve>CVE-2019-14379</cve>
-        <cve>CVE-2019-14439</cve>
-        <cve>CVE-2019-16335</cve>
-        <cve>CVE-2019-14540</cve>
+        <cve>CVE-2019-16942</cve>
+        <cve>CVE-2019-16943</cve>
     </suppress>
 
     <suppress>
