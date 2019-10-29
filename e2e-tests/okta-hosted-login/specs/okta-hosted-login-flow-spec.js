@@ -31,6 +31,12 @@ describe('Okta Hosted Login Flow', () => {
     browser.ignoreSynchronization = true;
   });
 
+  afterAll(() => {
+    browser.driver.close().then(() => {
+      browser.driver.quit();
+    });
+  });
+
   it('can login with Okta as the IDP', async () => {
     browser.get(appRoot);
     loginHomePage.waitForPageLoad();
