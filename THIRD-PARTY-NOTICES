@@ -22,11 +22,15 @@ This project includes:
   Hamcrest under BSD License 3
   Hamcrest Core under New BSD License
   Hamcrest library under New BSD License
+  Jackson-annotations under The Apache Software License, Version 2.0
+  Jackson-core under The Apache Software License, Version 2.0
+  jackson-databind under The Apache Software License, Version 2.0
   Java Architecture for XML Binding under CDDL 1.1 or GPL2 w/ CPE
   JAXB OSGI under CDDL+GPL License
   JCL 1.2 implemented over SLF4J under Apache License, Version 2.0
   jcommander under Apache 2.0
   JJWT :: API under Apache License, Version 2.0
+  JJWT :: Extensions :: Jackson under Apache License, Version 2.0
   JJWT :: Impl under Apache License, Version 2.0
   json-path under Apache 2.0
   Logback Classic Module under Eclipse Public License - v 1.0 or GNU Lesser General Public License
