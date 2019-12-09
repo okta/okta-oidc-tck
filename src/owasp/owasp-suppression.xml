@@ -57,7 +57,7 @@
 
     <suppress>
         <notes><![CDATA[
-        file name: wiremock-standalone-2.23.2.jar/META-INF/maven/com.fasterxml.jackson.core/jackson-databind/pom.xml
+        file name: wiremock-standalone-2.25.1.jar/META-INF/maven/com.fasterxml.jackson.core/jackson-databind/pom.xml
 
         wiremock-standalone repackages it's dependencies so we cannot update this version of Jackson directly.
         Multiple deserializes vulns have been reported.  We use this lib to mock OAuth2/OIDC request/response for
@@ -66,6 +66,7 @@
         <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:.*$</gav>
         <cve>CVE-2019-16942</cve>
         <cve>CVE-2019-16943</cve>
+        <cve>CVE-2019-17531</cve>
     </suppress>
 
     <suppress>
