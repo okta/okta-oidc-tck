@@ -46,7 +46,9 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
     String pubKeyE
     String pubKeyN
     String accessTokenJwt
+    String accessTokenWithGroupsJwt
     JwtBuilder idTokenJwtBuilder
+    JwtBuilder idTokenWithGroupsJwtBuilder
     JwtBuilder wrongKeyIdIdTokenJwtBuilder
     JwtBuilder wrongAudienceIdTokenJwtBuilder
     JwtBuilder issuedInFutureIdTokenJwtBuilder
@@ -86,11 +88,39 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
                 .compact()
 
+        accessTokenWithGroupsJwt =  Jwts.builder()
+                .setSubject("joe.coder@example.com")
+                .setAudience("api://default")
+                .claim("scp", ["profile", "openid", "email"])
+                .claim("groups", ["Everyone", "Test-Group"])
+                .setIssuedAt(Date.from(now))
+                .setNotBefore(Date.from(now))
+                .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
+                .setHeader(Jwts.jwsHeader()
+                .setKeyId('TEST_PUB_KEY_ID'))
+                .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
+                .compact()
+
         idTokenJwtBuilder =  Jwts.builder()
                 .setSubject("00uid4BxXw6I6TV4m0g3")
                 .claim("name", "Joe Coder")
                 .claim("email", "joe.coder@example.com")
                 .claim("preferred_username", "jod.coder@example.com")
+                .setAudience("OOICU812")
+                .setIssuer(issuerUrl)
+                .setIssuedAt(Date.from(now))
+                .setNotBefore(Date.from(now))
+                .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
+                .setHeader(Jwts.jwsHeader()
+                .setKeyId('TEST_PUB_KEY_ID'))
+                .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
+
+        idTokenWithGroupsJwtBuilder =  Jwts.builder()
+                .setSubject("00uid4BxXw6I6TV4m0g3")
+                .claim("name", "Joe Coder")
+                .claim("email", "joe.coder@example.com")
+                .claim("preferred_username", "jod.coder@example.com")
+                .claim("groups", ["Everyone", "Test-Group"])
                 .setAudience("OOICU812")
                 .setIssuer(issuerUrl)
                 .setIssuedAt(Date.from(now))
@@ -244,6 +274,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                         .withQueryParam("state", matching(".{6,}"))
                         .willReturn(aResponse()
                         .withBody("<html>fake_login_page<html/>")))
+
         wireMockServer.stubFor(
                 post(urlPathEqualTo("/oauth2/default/v1/token"))
                         .withHeader("Authorization", equalTo(authHeader))
@@ -254,6 +285,17 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                                 .withHeader("Content-Type", "application/json;charset=UTF-8")
                                 .withBodyFile("token.json")
                                 .withTransformer("gstring-template", "idTokenJwt", new JwtWithNonce("TEST_CODE", idTokenJwtBuilder))))
+
+        wireMockServer.stubFor(
+                post(urlPathEqualTo("/oauth2/default/v1/token"))
+                        .withHeader("Authorization", equalTo(authHeader))
+                        .withRequestBody(containing("grant_type=authorization_code"))
+                        .withRequestBody(containing("code=TEST_CODE_GROUPS&"))
+                        .withRequestBody(matching(".*"+Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" +Pattern.quote(redirectUriPathEscaped) +".*"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json;charset=UTF-8")
+                                .withBodyFile("token.json")
+                                .withTransformer("gstring-template", "idTokenJwt", new JwtWithNonce("TEST_CODE_GROUPS", idTokenWithGroupsJwtBuilder))))
 
         wireMockServer.stubFor(
                 post(urlPathEqualTo("/oauth2/default/v1/token"))
@@ -356,6 +398,13 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                         .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json;charset=UTF-8")
                         .withBodyFile("userinfo.json")))
+
+        wireMockServer.stubFor(
+                get(urlPathEqualTo("/oauth2/default/v1/userinfo"))
+                        .withHeader("Authorization", containing("Bearer ${accessTokenWithGroupsJwt}"))
+                        .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json;charset=UTF-8")
+                        .withBodyFile("userinfo-groups.json")))
     }
 
     private class JwtWithNonce implements Function<Request, String> {

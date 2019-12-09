@@ -71,6 +71,15 @@ class PkceCodeRemoteValidationScenarioDefinition implements ScenarioDefinition {
                         .withBodyFile("remote-validation-token.json")))
 
         wireMockServer.stubFor(
+                post(urlPathEqualTo("/oauth2/default/v1/token"))
+                        .withRequestBody(containing("grant_type=authorization_code"))
+                        .withRequestBody(containing("code=TEST_CODE_GROUPS&"))
+                        .withRequestBody(matching(".*"+Pattern.quote("redirect_uri=http%3A%2F%2Flocalhost%3A") + "\\d+" +Pattern.quote(redirectUriPathEscaped) +".*"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json;charset=UTF-8")
+                                .withBodyFile("remote-validation-token-groups.json")))
+
+        wireMockServer.stubFor(
                 get(urlPathEqualTo("/oauth2/default/v1/userinfo"))
                         .withHeader("Authorization", equalTo("Bearer accessTokenJwt"))
                         .willReturn(aResponse()

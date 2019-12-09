@@ -49,7 +49,7 @@ import static com.okta.test.mock.scenarios.Scenario.OIDC_CODE_FLOW_LOCAL_VALIDAT
 import static com.okta.test.mock.wiremock.TestUtils.followRedirectUntilLocation
 
 @Scenario(OIDC_CODE_FLOW_LOCAL_VALIDATION)
-class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
+class OIDCCodeFlowLocalValidationIT extends BaseValidationIT {
 
     private def redirectUriPath = Config.Global.codeFlowRedirectPath
 
@@ -330,71 +330,51 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
                 .extract())
     }
 
-    ExtractableResponse doLogin(Filter filter = new CookieFilter()) {
-        ExtractableResponse response = redirectToRemoteLogin()
-        String redirectUrl = response.header("Location")
-        String state = getState(redirectUrl)
-        String code = "TEST_CODE"
-        setNonce(redirectUrl, code)
-        String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
+    /**
+     * Optional test for implementations that support mapping a `groups` claim to an application role
+     */
+    @Test
+    void testGroupInClaimToAuthority() {
+        Filter filter = new CookieFilter()
+        doLogin(filter, "TEST_CODE_GROUPS")
 
-        ExtractableResponse initialResponse = given()
-                .filter(filter)
-                .redirects()
-                    .follow(false)
-                .accept(ContentType.JSON)
-                .cookies(response.cookies())
-            .when()
-                .get(requestUrl)
-            .then()
-                .extract()
-
-        return followRedirectUntilLocation(initialResponse,
-                                    allOf(TckMatchers.responseCode(200),
-                                          TckMatchers.bodyMatcher(containsString("Welcome home"))),
-                                    3,
-                                    "http://localhost:${applicationPort}",
-                                    filter)
+        // make sure these cookies are good (it's easy to mix up the cookies between the mock server and the app server)
+         given()
+            .redirects()
+                .follow(false)
+            .accept(ContentType.JSON)
+            .filter(filter)
+        .when()
+            .get("http://localhost:${applicationPort}/everyone")
+        .then()
+            .statusCode(200)
+            .body(containsString("Everyone has Access:"))
+        .extract()
     }
 
-    private String getState(String redirectUrl) {
-        return getQueryParamValue(redirectUrl, "state")
-    }
+    /**
+     * Optional test for implementations that support mapping a `groups` claim to an application role
+     */
+    @Test
+    void testInvalidGroupClaimMapping() {
+        Filter filter = new CookieFilter()
+        doLogin(filter, "TEST_CODE_GROUPS")
 
-    private String getNonce(String redirectUrl) {
-        return getQueryParamValue(redirectUrl, "nonce")
-    }
-
-    private void setNonce(String redirectUrl, String key) {
-        String nonce = getNonce(redirectUrl)
-        NonceHolder.setNonce(key, nonce)
-    }
-
-    private String getQueryParamValue(String redirectUrl, String paramName) {
-        def value = TestUtils.parseQuery(new URL(redirectUrl).query).get(paramName)
-        return value != null ? value[0] : null
-    }
-
-    protected Matcher<?> loginPageMatcher() {
-        return Matchers.equalTo("<html>fake_login_page<html/>")
-    }
-
-    def loginPageLocationMatcher() {
-        return urlMatcher("${baseUrl}/oauth2/default/v1/authorize",
-                singleQueryValue("client_id", "OOICU812"),
-                singleQueryValue("redirect_uri", "http://localhost:${applicationPort}${redirectUriPath}"),
-                singleQueryValue("response_type", "code"),
-                singleQueryValue("scope", "profile email openid"),
-                singleQueryValue("state", matchesPattern(".{6,}")))
+        // make sure these cookies are good (it's easy to mix up the cookies between the mock server and the app server)
+         given()
+            .redirects()
+                .follow(false)
+            .accept(ContentType.JSON)
+            .filter(filter)
+        .when()
+            .get("http://localhost:${applicationPort}/invalidGroup")
+        .then()
+            .statusCode(403)
+        .extract()
     }
 
     def errorPageMatcher() {
         return containsString("Invalid credentials")
-    }
-
-    @Override
-    String getProtectedPath() {
-        return Config.Global.getConfigProperty("redirect.path", super.getProtectedPath())
     }
 
     /*
