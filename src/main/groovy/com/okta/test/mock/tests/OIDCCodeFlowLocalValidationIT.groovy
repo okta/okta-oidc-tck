@@ -330,11 +330,53 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
                 .extract())
     }
 
-    ExtractableResponse doLogin(Filter filter = new CookieFilter()) {
+    /**
+     * Optional test for implementations that support mapping a `groups` claim to an application role
+     */
+    @Test
+    void testGroupInClaimToAuthority() {
+        Filter filter = new CookieFilter()
+        doLogin(filter, "TEST_CODE_GROUPS")
+
+        // make sure these cookies are good (it's easy to mix up the cookies between the mock server and the app server)
+         given()
+            .redirects()
+                .follow(false)
+            .accept(ContentType.JSON)
+            .filter(filter)
+        .when()
+            .get("http://localhost:${applicationPort}/everyone")
+        .then()
+            .statusCode(200)
+            .body(containsString("Everyone has Access:"))
+        .extract()
+    }
+
+    /**
+     * Optional test for implementations that support mapping a `groups` claim to an application role
+     */
+    @Test
+    void testInvalidGroupClaimMapping() {
+        Filter filter = new CookieFilter()
+        doLogin(filter, "TEST_CODE_GROUPS")
+
+        // make sure these cookies are good (it's easy to mix up the cookies between the mock server and the app server)
+         given()
+            .redirects()
+                .follow(false)
+            .accept(ContentType.JSON)
+            .filter(filter)
+        .when()
+            .get("http://localhost:${applicationPort}/invalidGroup")
+        .then()
+            .statusCode(403)
+        .extract()
+    }
+
+    ExtractableResponse doLogin(Filter filter = new CookieFilter(), String code = "TEST_CODE") {
         ExtractableResponse response = redirectToRemoteLogin()
         String redirectUrl = response.header("Location")
         String state = getState(redirectUrl)
-        String code = "TEST_CODE"
         setNonce(redirectUrl, code)
         String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
 
