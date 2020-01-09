@@ -49,7 +49,7 @@ import static com.okta.test.mock.scenarios.Scenario.OIDC_CODE_FLOW_LOCAL_VALIDAT
 import static com.okta.test.mock.wiremock.TestUtils.followRedirectUntilLocation
 
 @Scenario(OIDC_CODE_FLOW_LOCAL_VALIDATION)
-class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
+class OIDCCodeFlowLocalValidationIT extends BaseValidationIT {
 
     private def redirectUriPath = Config.Global.codeFlowRedirectPath
 
@@ -373,70 +373,8 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         .extract()
     }
 
-    ExtractableResponse doLogin(Filter filter = new CookieFilter(), String code = "TEST_CODE") {
-        ExtractableResponse response = redirectToRemoteLogin()
-        String redirectUrl = response.header("Location")
-        String state = getState(redirectUrl)
-        setNonce(redirectUrl, code)
-        String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
-
-        ExtractableResponse initialResponse = given()
-                .filter(filter)
-                .redirects()
-                    .follow(false)
-                .accept(ContentType.JSON)
-                .cookies(response.cookies())
-            .when()
-                .get(requestUrl)
-            .then()
-                .extract()
-
-        return followRedirectUntilLocation(initialResponse,
-                                    allOf(TckMatchers.responseCode(200),
-                                          TckMatchers.bodyMatcher(containsString("Welcome home"))),
-                                    3,
-                                    "http://localhost:${applicationPort}",
-                                    filter)
-    }
-
-    private String getState(String redirectUrl) {
-        return getQueryParamValue(redirectUrl, "state")
-    }
-
-    private String getNonce(String redirectUrl) {
-        return getQueryParamValue(redirectUrl, "nonce")
-    }
-
-    private void setNonce(String redirectUrl, String key) {
-        String nonce = getNonce(redirectUrl)
-        NonceHolder.setNonce(key, nonce)
-    }
-
-    private String getQueryParamValue(String redirectUrl, String paramName) {
-        def value = TestUtils.parseQuery(new URL(redirectUrl).query).get(paramName)
-        return value != null ? value[0] : null
-    }
-
-    protected Matcher<?> loginPageMatcher() {
-        return Matchers.equalTo("<html>fake_login_page<html/>")
-    }
-
-    def loginPageLocationMatcher() {
-        return urlMatcher("${baseUrl}/oauth2/default/v1/authorize",
-                singleQueryValue("client_id", "OOICU812"),
-                singleQueryValue("redirect_uri", "http://localhost:${applicationPort}${redirectUriPath}"),
-                singleQueryValue("response_type", "code"),
-                singleQueryValue("scope", "profile email openid"),
-                singleQueryValue("state", matchesPattern(".{6,}")))
-    }
-
     def errorPageMatcher() {
         return containsString("Invalid credentials")
-    }
-
-    @Override
-    String getProtectedPath() {
-        return Config.Global.getConfigProperty("redirect.path", super.getProtectedPath())
     }
 
     /*

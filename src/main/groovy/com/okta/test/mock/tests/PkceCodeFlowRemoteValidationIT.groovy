@@ -18,7 +18,11 @@ package com.okta.test.mock.tests
 import com.okta.test.mock.Config
 import com.okta.test.mock.Scenario
 import com.okta.test.mock.application.ApplicationTestRunner
+import com.okta.test.mock.matchers.TckMatchers
+import com.okta.test.mock.scenarios.NonceHolder
 import com.okta.test.mock.wiremock.TestUtils
+import io.restassured.filter.Filter
+import io.restassured.filter.cookie.CookieFilter
 import io.restassured.http.ContentType
 import io.restassured.response.ExtractableResponse
 import org.hamcrest.Matcher
@@ -28,12 +32,15 @@ import org.testng.annotations.Test
 import static com.okta.test.mock.matchers.UrlMatcher.singleQueryValue
 import static com.okta.test.mock.matchers.UrlMatcher.urlMatcher
 import static com.okta.test.mock.scenarios.Scenario.PKCE_CODE_FLOW_REMOTE_VALIDATION
+import static com.okta.test.mock.wiremock.TestUtils.followRedirectUntilLocation
 import static io.restassured.RestAssured.given
+import static org.hamcrest.Matchers.allOf
+import static org.hamcrest.Matchers.containsString
 import static org.hamcrest.Matchers.isOneOf
 import static org.hamcrest.text.MatchesPattern.matchesPattern
 
 @Scenario(PKCE_CODE_FLOW_REMOTE_VALIDATION)
-class PkceCodeFlowRemoteValidationIT extends ApplicationTestRunner {
+class PkceCodeFlowRemoteValidationIT extends BaseValidationIT {
 
     private def redirectUriPath = Config.Global.codeFlowRedirectPath
 
@@ -94,21 +101,50 @@ class PkceCodeFlowRemoteValidationIT extends ApplicationTestRunner {
 
     }
 
-    protected Matcher<?> loginPageMatcher() {
-        return Matchers.equalTo("<html>fake_login_page<html/>")
+    /**
+     * Optional test for implementations that support mapping a `groups` claim to an application role
+     */
+    @Test
+    void testGroupInClaimToAuthority() {
+        Filter filter = new CookieFilter()
+        doLogin(filter, "TEST_CODE_GROUPS")
+
+        // make sure these cookies are good (it's easy to mix up the cookies between the mock server and the app server)
+        given()
+            .redirects()
+            .follow(false)
+            .accept(ContentType.JSON)
+            .filter(filter)
+        .when()
+            .get("http://localhost:${applicationPort}/everyone")
+        .then()
+            .statusCode(200)
+            .body(containsString("Everyone has Access:"))
+            .extract()
     }
 
-    protected Matcher loginPageLocationMatcher() {
-        return urlMatcher("${baseUrl}/oauth2/default/v1/authorize",
-                singleQueryValue("client_id", "OOICU812"),
-                singleQueryValue("redirect_uri", "http://localhost:${applicationPort}${redirectUriPath}"),
-                singleQueryValue("response_type", "code"),
-                singleQueryValue("scope", "offline_access"),
-                singleQueryValue("state", matchesPattern(".{6,}")))
+    /**
+     * Optional test for implementations that support mapping a `groups` claim to an application role
+     */
+    @Test
+    void testInvalidGroupClaimMapping() {
+        Filter filter = new CookieFilter()
+        doLogin(filter, "TEST_CODE_GROUPS")
+
+        // make sure these cookies are good (it's easy to mix up the cookies between the mock server and the app server)
+        given()
+            .redirects()
+            .follow(false)
+            .accept(ContentType.JSON)
+            .filter(filter)
+        .when()
+            .get("http://localhost:${applicationPort}/invalidGroup")
+        .then()
+            .statusCode(403)
+            .extract()
     }
 
-    @Override
-    String getProtectedPath() {
-        return System.getProperty("redirect.path", super.getProtectedPath())
+    Matcher loginPageLocationMatcher() {
+        return loginPageLocationMatcher("offline_access")
     }
 }
