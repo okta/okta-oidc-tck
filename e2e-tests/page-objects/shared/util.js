@@ -22,3 +22,7 @@ util.se = val => `[data-se="${val}"]`;
 util.urlContains = (str) => {
   return EC.urlContains(str)();
 }
+
+util.waitTillElementContainsText = (elem, text) => {
+  return browser.wait(EC.textToBePresentInElement(elem, text));
+}

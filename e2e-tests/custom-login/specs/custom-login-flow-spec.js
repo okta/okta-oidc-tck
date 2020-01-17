@@ -51,6 +51,8 @@ describe('Custom Login Flow', () => {
 
     await customSignInPage.login(browser.params.login.username, browser.params.login.password);
     authenticatedHomePage.waitForPageLoad();
+    authenticatedHomePage.waitForWelcomeTextToLoad();
+    expect(authenticatedHomePage.getUIText()).toContain('Welcome');
   });
 
   it('can access user profile', async () => {

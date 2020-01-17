@@ -19,6 +19,7 @@ class AuthenticatedHomePage {
   constructor() {
     this.$profileButton = $('#profile-button');
     this.$logoutButton = $('#logout-button');
+    this.$textContainer = $('.text.container');
 
     // For asp.net webforms you can't have ids with hyphens
     // https://stackoverflow.com/questions/25919471/how-to-get-html-control-by-id-that-has-hyphens
@@ -44,6 +45,15 @@ class AuthenticatedHomePage {
 
   viewMessages() {
     return this.$messagesLink.click();
+  }
+
+  waitForWelcomeTextToLoad() {
+    return util.waitTillElementContainsText(this.$textContainer, 'Welcome');
+  }
+
+  getUIText() {
+    browser.wait(this.$textContainer.getText());
+    return this.$textContainer.getText();
   }
 }
 
