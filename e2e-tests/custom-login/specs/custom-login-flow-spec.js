@@ -12,12 +12,15 @@
 
 'use strict';
 
-const LoginHomePage = require('../../page-objects/shared/login-home-page');
-const CustomSignInPage = require('../../page-objects/custom-signin-page');
-const AuthenticatedHomePage = require('../../page-objects/shared/authenticated-home-page');
-const ProfilePage = require('../../page-objects/shared/profile-page');
-const MessagesPage = require('../../page-objects/messages-page');
-const url = require('url');
+import { Eyes } from "eyes.selenium";
+var eyes = new Eyes();
+
+import LoginHomePage from '../../page-objects/shared/login-home-page';
+import CustomSignInPage from '../../page-objects/custom-signin-page';
+import AuthenticatedHomePage from '../../page-objects/shared/authenticated-home-page';
+import ProfilePage from '../../page-objects/shared/profile-page';
+import MessagesPage from '../../page-objects/messages-page';
+import { parse } from 'url';
 
 describe('Custom Login Flow', () => {
   const loginHomePage = new LoginHomePage();
@@ -38,14 +41,21 @@ describe('Custom Login Flow', () => {
   });
 
   it('can login with Okta as the IDP using custom signin page', async () => {
+    // Open a chrome browser.
+    eyes.open(browser, "Custom Login", "Login with Okta IDP");
+
     browser.get(appRoot);
     loginHomePage.waitForPageLoad();
+
+    eyes.checkWindow("Login Home Page");
 
     loginHomePage.clickLoginButton();
     customSignInPage.waitForPageLoad();
 
+    eyes.checkWindow("Custom Sign in Page");
+
     // Verify that current domain hasn't changed to okta-hosted login, rather a local custom login page
-    const urlProperties = url.parse(process.env.ISSUER);
+    const urlProperties = parse(process.env.ISSUER);
     expect(browser.getCurrentUrl()).not.toContain(urlProperties.host);
     expect(browser.getCurrentUrl()).toContain(appRoot);
 
@@ -53,6 +63,9 @@ describe('Custom Login Flow', () => {
     authenticatedHomePage.waitForPageLoad();
     authenticatedHomePage.waitForWelcomeTextToLoad();
     expect(authenticatedHomePage.getUIText()).toContain('Welcome');
+
+    eyes.checkWindow("Welcome Page");
+    eyes.close();
   });
 
   it('can access user profile', async () => {
