@@ -29,6 +29,10 @@ describe('Custom Login Flow', () => {
 
   beforeEach(() => {
     browser.ignoreSynchronization = true;
+    if (process.env.DEFAULT_TIMEOUT_INTERVAL) {
+      console.log(`Setting default timeout interval to ${process.env.DEFAULT_TIMEOUT_INTERVAL}`)
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = process.env.DEFAULT_TIMEOUT_INTERVAL;
+    }
   });
 
   afterAll(() => {
