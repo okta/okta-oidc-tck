@@ -35,8 +35,13 @@ describe('Okta Hosted Login Flow', () => {
     browser.get(appRoot);
     loginHomePage.waitForPageLoad();
 
+    console.log("Loaded login home page...");
+
     loginHomePage.clickLoginButton();
+    console.log("Clicked login button...");
+
     oktaSignInPage.waitForPageLoad();
+    console.log("Loaded sign-in page...");
 
     // Verify that current domain has changed to okta-hosted login page
     const urlProperties = url.parse(process.env.ISSUER);
@@ -44,6 +49,8 @@ describe('Okta Hosted Login Flow', () => {
     expect(browser.getCurrentUrl()).not.toContain(appRoot);
 
     await oktaSignInPage.login(browser.params.login.username, browser.params.login.password);
+    console.log("Clicked sign-in page submit...");
+
     authenticatedHomePage.waitForPageLoad();
   });
 
