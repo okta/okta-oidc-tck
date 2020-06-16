@@ -20,6 +20,8 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse
 import static com.github.tomakehurst.wiremock.client.WireMock.containing
 import static com.github.tomakehurst.wiremock.client.WireMock.get
+import static com.github.tomakehurst.wiremock.client.WireMock.matching
+import static com.github.tomakehurst.wiremock.client.WireMock.post
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 
 class ImplicitRemoteValidationScenarioDefinition implements ScenarioDefinition {
@@ -46,5 +48,13 @@ class ImplicitRemoteValidationScenarioDefinition implements ScenarioDefinition {
                         .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json;charset=UTF-8")
                         .withBodyFile("userinfo-remote-access-token.json")))
+
+        wireMockServer.stubFor(
+                post(urlPathEqualTo("/oauth2/default/v1/introspect"))
+                    .withRequestBody(matching(".*token=some.random.jwt.*"))
+                        .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json;charset=UTF-8")
+                        .withBodyFile("introspect.json")))
+
     }
 }

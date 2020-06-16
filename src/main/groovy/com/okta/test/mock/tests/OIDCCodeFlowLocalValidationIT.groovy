@@ -19,26 +19,37 @@ import com.okta.test.mock.Config
 import com.okta.test.mock.Scenario
 import com.okta.test.mock.application.ApplicationTestRunner
 import com.okta.test.mock.matchers.TckMatchers
+import com.okta.test.mock.scenarios.NonceHolder
 import com.okta.test.mock.wiremock.TestUtils
+import io.restassured.filter.Filter
+import io.restassured.filter.cookie.CookieFilter
+import io.restassured.filter.session.SessionFilter
 import io.restassured.http.ContentType
 import io.restassured.response.ExtractableResponse
 import io.restassured.response.Response
 import org.hamcrest.Matcher
+import org.hamcrest.MatcherAssert
 import org.hamcrest.Matchers
 import org.testng.annotations.Test
 
 import static com.okta.test.mock.matchers.UrlMatcher.singleQueryValue
 import static com.okta.test.mock.matchers.UrlMatcher.urlMatcher
 import static io.restassured.RestAssured.given
+import static io.restassured.RestAssured.post
 import static org.hamcrest.Matchers.allOf
 import static org.hamcrest.Matchers.anyOf
 import static org.hamcrest.Matchers.containsString
+import static org.hamcrest.Matchers.either
+import static org.hamcrest.Matchers.is
+import static org.hamcrest.Matchers.isOneOf
+import static org.hamcrest.Matchers.not
+import static org.hamcrest.Matchers.nullValue
 import static org.hamcrest.text.MatchesPattern.matchesPattern
 import static com.okta.test.mock.scenarios.Scenario.OIDC_CODE_FLOW_LOCAL_VALIDATION
 import static com.okta.test.mock.wiremock.TestUtils.followRedirectUntilLocation
 
 @Scenario(OIDC_CODE_FLOW_LOCAL_VALIDATION)
-class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
+class OIDCCodeFlowLocalValidationIT extends BaseValidationIT {
 
     private def redirectUriPath = Config.Global.codeFlowRedirectPath
 
@@ -70,27 +81,47 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
 
     @Test
     void respondWithCode() {
-        ExtractableResponse response = redirectToRemoteLogin()
-        String redirectUrl = response.header("Location")
-        String state = getState(redirectUrl)
-        String code = "TEST_CODE"
-        String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
+        doLogin()
+    }
 
-        ExtractableResponse initialResponse = given()
-                .redirects()
-                    .follow(false)
-                .accept(ContentType.JSON)
-                .cookies(response.cookies())
-            .when().log().everything()
-                .get(requestUrl)
-            .then()
-                .extract()
+    @Test
+    void rpInitiatedLogoutTest() {
+        Filter filter = new CookieFilter()
+        doLogin(filter)
 
-        followRedirectUntilLocation(initialResponse,
-                                    allOf(TckMatchers.responseCode(200),
-                                          TckMatchers.bodyMatcher(containsString("Welcome home"))),
-                                    3,
-                                    "http://localhost:${applicationPort}")
+        // make sure these cookies are good (it's easy to mix up the cookies between the mock server and the app server)
+         given()
+            .redirects()
+                .follow(false)
+            .accept(ContentType.JSON)
+            .filter(filter)
+        .when()
+            .get("http://localhost:${applicationPort}/")
+        .then()
+            .body(containsString("Welcome home"))
+        .extract()
+
+        // then trigger a logout: POST /logout
+        given()
+            .redirects()
+                .follow(false)
+            .filter(filter)
+        .when()
+            .post("http://localhost:${applicationPort}/logout")
+        .then()
+            .statusCode(302) // logout should redirect somewhere
+
+        // TODO: there should probably be a back channel request in here, but for now this is what Spring supports
+
+         given()
+            .redirects()
+                .follow(false)
+            .accept(ContentType.JSON)
+            .filter(filter)
+        .when()
+            .get("http://localhost:${applicationPort}/")
+        .then()
+            .statusCode(isOneOf(302, 401)) // work around for Spring Reactive returning a 401 with a bad cookie
     }
 
     @Test
@@ -138,6 +169,7 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String redirectUrl = response.header("Location")
         String state = getState(redirectUrl)
         String code = "TEST_CODE_invalidSignatureIdTokenJwt"
+        setNonce(redirectUrl, code)
         String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
 
         assertAccessDenied(
@@ -158,6 +190,7 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String redirectUrl = response.header("Location")
         String state = getState(redirectUrl)
         String code = "TEST_CODE_wrongKeyIdIdTokenJwt"
+        setNonce(redirectUrl, code)
         String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
 
         assertAccessDenied(
@@ -178,6 +211,7 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String redirectUrl = response.header("Location")
         String state = getState(redirectUrl)
         String code = "TEST_CODE_issuedInFutureIdTokenJwt"
+        setNonce(redirectUrl, code)
         String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
 
         assertAccessDenied(
@@ -198,6 +232,7 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String redirectUrl = response.header("Location")
         String state = getState(redirectUrl)
         String code = "TEST_CODE_expiredIdTokenJwt"
+        setNonce(redirectUrl, code)
         String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
 
         assertAccessDenied(
@@ -218,6 +253,7 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String redirectUrl = response.header("Location")
         String state = getState(redirectUrl)
         String code = "TEST_CODE_wrongAudienceIdTokenJwt"
+        setNonce(redirectUrl, code)
         String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
 
         assertAccessDenied(
@@ -238,6 +274,7 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String redirectUrl = response.header("Location")
         String state = getState(redirectUrl)
         String code = "TEST_CODE_invalidIssuerIdTokenJwt"
+        setNonce(redirectUrl, code)
         String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
 
         assertAccessDenied(
@@ -258,6 +295,7 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String redirectUrl = response.header("Location")
         String state = getState(redirectUrl)
         String code = "TEST_CODE_invalidNotBeforeIdTokenJwt"
+        setNonce(redirectUrl, code)
         String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
 
         assertAccessDenied(given()
@@ -277,6 +315,7 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
         String redirectUrl = response.header("Location")
         String state = getState(redirectUrl)
         String code = "TEST_CODE_unsignedIdTokenJwt"
+        setNonce(redirectUrl, code)
         String requestUrl = "http://localhost:${applicationPort}${redirectUriPath}?code=${code}&state=${state}"
 
         assertAccessDenied(
@@ -291,30 +330,51 @@ class OIDCCodeFlowLocalValidationIT extends ApplicationTestRunner {
                 .extract())
     }
 
-    private String getState(String redirectUrl) {
-        return TestUtils.parseQuery(new URL(redirectUrl).query).get("state")[0]
+    /**
+     * Optional test for implementations that support mapping a `groups` claim to an application role
+     */
+    @Test
+    void testGroupInClaimToAuthority() {
+        Filter filter = new CookieFilter()
+        doLogin(filter, "TEST_CODE_GROUPS")
+
+        // make sure these cookies are good (it's easy to mix up the cookies between the mock server and the app server)
+         given()
+            .redirects()
+                .follow(false)
+            .accept(ContentType.JSON)
+            .filter(filter)
+        .when()
+            .get("http://localhost:${applicationPort}/everyone")
+        .then()
+            .statusCode(200)
+            .body(containsString("Everyone has Access:"))
+        .extract()
     }
 
-    protected Matcher<?> loginPageMatcher() {
-        return Matchers.equalTo("<html>fake_login_page<html/>")
-    }
+    /**
+     * Optional test for implementations that support mapping a `groups` claim to an application role
+     */
+    @Test
+    void testInvalidGroupClaimMapping() {
+        Filter filter = new CookieFilter()
+        doLogin(filter, "TEST_CODE_GROUPS")
 
-    def loginPageLocationMatcher() {
-        return urlMatcher("${baseUrl}/oauth2/default/v1/authorize",
-                singleQueryValue("client_id", "OOICU812"),
-                singleQueryValue("redirect_uri", "http://localhost:${applicationPort}${redirectUriPath}"),
-                singleQueryValue("response_type", "code"),
-                singleQueryValue("scope", "profile email openid"),
-                singleQueryValue("state", matchesPattern(".{6,}")))
+        // make sure these cookies are good (it's easy to mix up the cookies between the mock server and the app server)
+         given()
+            .redirects()
+                .follow(false)
+            .accept(ContentType.JSON)
+            .filter(filter)
+        .when()
+            .get("http://localhost:${applicationPort}/invalidGroup")
+        .then()
+            .statusCode(403)
+        .extract()
     }
 
     def errorPageMatcher() {
         return containsString("Invalid credentials")
-    }
-
-    @Override
-    String getProtectedPath() {
-        return Config.Global.getConfigProperty("redirect.path", super.getProtectedPath())
     }
 
     /*

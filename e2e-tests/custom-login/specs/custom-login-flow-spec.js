@@ -29,6 +29,16 @@ describe('Custom Login Flow', () => {
 
   beforeEach(() => {
     browser.ignoreSynchronization = true;
+    if (process.env.DEFAULT_TIMEOUT_INTERVAL) {
+      console.log(`Setting default timeout interval to ${process.env.DEFAULT_TIMEOUT_INTERVAL}`)
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = process.env.DEFAULT_TIMEOUT_INTERVAL;
+    }
+  });
+
+  afterAll(() => {
+    browser.driver.close().then(() => {
+      browser.driver.quit();
+    });
   });
 
   it('can login with Okta as the IDP using custom signin page', async () => {
@@ -45,6 +55,8 @@ describe('Custom Login Flow', () => {
 
     await customSignInPage.login(browser.params.login.username, browser.params.login.password);
     authenticatedHomePage.waitForPageLoad();
+    authenticatedHomePage.waitForWelcomeTextToLoad();
+    expect(authenticatedHomePage.getUIText()).toContain('Welcome');
   });
 
   it('can access user profile', async () => {

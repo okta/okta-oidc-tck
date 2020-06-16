@@ -21,6 +21,7 @@ import io.restassured.http.ContentType
 import org.testng.annotations.Test
 
 import static io.restassured.RestAssured.given
+import static org.hamcrest.Matchers.containsString
 import static org.hamcrest.Matchers.startsWith
 import static com.okta.test.mock.scenarios.Scenario.IMPLICIT_FLOW_REMOTE_VALIDATION
 
@@ -36,7 +37,7 @@ class ImplicitRemoteValidationIT extends ApplicationTestRunner {
             .get("http://localhost:${applicationPort}/api/messages")
         .then()
             .statusCode(401)
-            .header("WWW-Authenticate", startsWith("Bearer realm="))
+            .header("WWW-Authenticate", startsWith("Bearer"))
     }
 
     @Test
@@ -47,6 +48,19 @@ class ImplicitRemoteValidationIT extends ApplicationTestRunner {
                 .follow(false)
         .when()
             .get("http://localhost:${applicationPort}/api/messages")
+        .then()
+            .statusCode(200)
+            .body(containsString("I am a robot."))
+    }
+
+    @Test
+    void invalidScopeTest() {
+        given()
+            .header("Authorization", "Bearer some.random.jwt")
+            .redirects()
+                .follow(false)
+        .when()
+            .get("http://localhost:${applicationPort}/api/invalidScope")
         .then()
             .statusCode(403)
     }
