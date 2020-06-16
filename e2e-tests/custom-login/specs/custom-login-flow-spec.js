@@ -44,9 +44,13 @@ describe('Custom Login Flow', () => {
   it('can login with Okta as the IDP using custom signin page', async () => {
     browser.get(appRoot);
     loginHomePage.waitForPageLoad();
+    console.log("Loaded login home page...");
 
     loginHomePage.clickLoginButton();
+    console.log("Clicked login button...");
+
     customSignInPage.waitForPageLoad();
+    console.log("Loaded sign-in page...");
 
     // Verify that current domain hasn't changed to okta-hosted login, rather a local custom login page
     const urlProperties = url.parse(process.env.ISSUER);
@@ -54,7 +58,11 @@ describe('Custom Login Flow', () => {
     expect(browser.getCurrentUrl()).toContain(appRoot);
 
     await customSignInPage.login(browser.params.login.username, browser.params.login.password);
+    console.log("Clicked sign-in page submit...");
+
     authenticatedHomePage.waitForPageLoad();
+    console.log("Loaded authenticated home page...");
+
     authenticatedHomePage.waitForWelcomeTextToLoad();
     expect(authenticatedHomePage.getUIText()).toContain('Welcome');
   });
@@ -62,6 +70,8 @@ describe('Custom Login Flow', () => {
   it('can access user profile', async () => {
     authenticatedHomePage.viewProfile();
     profile.waitForPageLoad();
+    console.log("Loaded profile page...");
+
     expect(profile.getEmailClaim()).toBe(browser.params.login.email);
   });
 
@@ -72,13 +82,18 @@ describe('Custom Login Flow', () => {
     }
     authenticatedHomePage.viewMessages();
     messagesPage.waitForPageLoad();
+    console.log("Loaded messages page...");
+
     expect(messagesPage.getMessage()).toBeTruthy();
   });
 
   it('can log the user out', async () => {
     browser.get(appRoot);
     authenticatedHomePage.waitForPageLoad();
+    console.log("Clicking logout button...");
+
     authenticatedHomePage.logout();
     loginHomePage.waitForPageLoad();
+    console.log("Loaded login page...");
   });
 });
