@@ -33,6 +33,37 @@
         <cve>CVE-2017-9735</cve>
         <cve>CVE-2019-10241</cve>
         <cve>CVE-2019-10247</cve>
+        <cve>CVE-2019-20330</cve>
+        <cve>CVE-2020-10672</cve>
+        <cve>CVE-2020-10673</cve>
+        <cve>CVE-2020-10968</cve>
+        <cve>CVE-2020-10969</cve>
+        <cve>CVE-2020-11111</cve>
+        <cve>CVE-2020-11112</cve>
+        <cve>CVE-2020-11113</cve>
+        <cve>CVE-2020-11619</cve>
+        <cve>CVE-2020-9547</cve>
+        <cve>CVE-2020-14060</cve>
+        <cve>CVE-2020-9548</cve>
+        <cve>CVE-2020-14061</cve>
+        <cve>CVE-2020-14062</cve>
+        <cve>CVE-2020-14195</cve>
+        <cve>CVE-2019-16942</cve>
+        <cve>CVE-2019-16943</cve>
+        <cve>CVE-2020-10969</cve>
+        <cve>CVE-2020-11619</cve>
+        <cve>CVE-2020-10968</cve>
+        <cve>CVE-2019-20330</cve>
+        <cve>CVE-2020-10673</cve>
+        <cve>CVE-2020-11620</cve>
+        <cve>CVE-2020-11113</cve>
+        <cve>CVE-2019-17531</cve>
+        <cve>CVE-2020-11112</cve>
+        <cve>CVE-2020-8840</cve>
+        <cve>CVE-2020-11111</cve>
+        <cve>CVE-2020-10672</cve>
+        <cve>CVE-2020-9546</cve>
+        <cve>CVE-2020-24616</cve>
     </suppress>
 
     <suppress>
