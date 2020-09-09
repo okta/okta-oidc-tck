@@ -386,6 +386,6 @@ class OIDCCodeFlowLocalValidationIT extends BaseValidationIT {
                                                                               TckMatchers.responseCode(403),
                                                                               TckMatchers.redirect(loginPageLocationMatcher()),
                                                                               TckMatchers.bodyMatcher(errorPageMatcher()))) {
-        followRedirectUntilLocation(response, responseMatcher)
+        followRedirectUntilLocation(response, responseMatcher, 3, "http://localhost:${applicationPort}")
     }
 }
