@@ -64,4 +64,18 @@ class ImplicitRemoteValidationIT extends ApplicationTestRunner {
         .then()
             .statusCode(403)
     }
+    
+    @Test
+    void test401ResponseBody() {
+        given()
+            .contentType(ContentType.ANY)
+            .redirects()
+                .follow(false)
+        .when()
+            .get("http://localhost:${applicationPort}/everyone")
+        .then()
+            .statusCode(401)
+            .header("WWW-Authenticate", startsWith("Bearer"))
+            .body(Matchers.equalTo(ERROR_401))
+    }
 }
