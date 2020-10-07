@@ -66,7 +66,7 @@ class ImplicitRemoteValidationIT extends ApplicationTestRunner {
     }
     
     @Test
-    void test401ResponseBody() {
+    void testNoAuthTokenReturns401() {
         given()
             .contentType(ContentType.ANY)
             .redirects()
