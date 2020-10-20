@@ -54,7 +54,7 @@ class ImplicitRemoteValidationScenarioDefinition implements ScenarioDefinition {
                     .withRequestBody(matching(".*token=some.random.jwt.*"))
                         .willReturn(aResponse()
                         .withHeader("Content-Type", "application/json;charset=UTF-8")
-                        .withBodyFile("introspect.json")))
+                        .withBodyFile("introspect-groups.json")))
 
     }
 }
