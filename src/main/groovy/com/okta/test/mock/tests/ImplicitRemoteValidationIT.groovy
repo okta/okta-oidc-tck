@@ -76,6 +76,6 @@ class ImplicitRemoteValidationIT extends ApplicationTestRunner {
         .then()
             .statusCode(401)
             .header("WWW-Authenticate", startsWith("Bearer"))
-            .body(Matchers.equalTo(ERROR_401))
+            .body(containsString("401 Unauthorized"))
     }
 }
