@@ -103,3 +103,4 @@ java -Dconfig=test/integration-test/resources/testRunner.yml -jar ${TCK_FILE} te
 ## Run Other Java tests?
 
 Of course, bug @bdemers for details.
+
