@@ -36,12 +36,12 @@ describe('Okta Hosted Login Flow', () => {
   });
 
   afterAll(() => {
-    browser.driver.close().then(() => {
+    return browser.driver.close().then(() => {
       browser.driver.quit();
     });
   });
 
-  it('can login with Okta as the IDP', async () => {
+  it('can login with Okta as the IDP', () => {
     browser.get(appRoot);
     loginHomePage.waitForPageLoad();
 
@@ -53,19 +53,19 @@ describe('Okta Hosted Login Flow', () => {
     expect(browser.getCurrentUrl()).toContain(urlProperties.host);
     expect(browser.getCurrentUrl()).not.toContain(appRoot);
 
-    await oktaSignInPage.login(browser.params.login.username, browser.params.login.password);
+    oktaSignInPage.login(browser.params.login.username, browser.params.login.password);
     authenticatedHomePage.waitForPageLoad();
     authenticatedHomePage.waitForWelcomeTextToLoad();
     expect(authenticatedHomePage.getUIText()).toContain('Welcome');
   });
 
-  it('can access user profile', async () => {
+  it('can access user profile', () => {
     authenticatedHomePage.viewProfile();
     profile.waitForPageLoad();
     expect(profile.getEmailClaim()).toBe(browser.params.login.email);
   });
 
-  it('can access resource server messages after login', async () => {
+  it('can access resource server messages after login', () => {
     // If it's not implicit flow, don't test messages resource server
     if (process.env.TEST_TYPE !== 'implicit') {
       return;
@@ -75,7 +75,7 @@ describe('Okta Hosted Login Flow', () => {
     expect(messagesPage.getMessage()).toBeTruthy();
   });
 
-  it('can log the user out', async () => {
+  it('can log the user out', () => {
     browser.get(appRoot);
     authenticatedHomePage.waitForPageLoad();
     authenticatedHomePage.logout();
