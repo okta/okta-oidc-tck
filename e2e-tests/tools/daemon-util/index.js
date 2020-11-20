@@ -21,9 +21,10 @@ const { execSync } = require('child_process');
 
 const daemonUtil = module.exports;
 
-function startNpmScript(script, color) {
+function startNpmScript(script, color, env) {
+  const command = env ? `${env} npm run` : 'npm run'
   const child = new Monitor(script, {
-    command: 'npm run',
+    command,
     max: 1,
     silent: true,
     spawnWith: {shell: true}
@@ -89,7 +90,7 @@ function waitOnPromise(opts, context) {
 }
 
 function startAndWait(opts) {
-  return startNpmScript(opts.script, opts.color)
+  return startNpmScript(opts.script, opts.color, opts.env)
   .then(child => waitOnPromise({
     resources: opts.resources,
   }, opts)
@@ -128,6 +129,7 @@ daemonUtil.startOktaHostedLoginServer = () => startAndWait({
   resources: [
     `tcp:8080`,
   ],
+  env: 'BROWSER=none'
 });
 
 daemonUtil.startCustomLoginServer = () => startAndWait({
@@ -136,6 +138,7 @@ daemonUtil.startCustomLoginServer = () => startAndWait({
   resources: [
     `tcp:8080`,
   ],
+  env: 'BROWSER=none'
 });
 
 daemonUtil.startResourceServer = () => startAndWait({
