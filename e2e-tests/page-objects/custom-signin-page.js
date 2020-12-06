@@ -34,7 +34,9 @@ class CustomSignInPage {
   login(username, password) {
     this.usernameInput.sendKeys(username);
     this.passwordInput.sendKeys(password);
+    console.log("Clicking submit");
     return this.submitButton.click();
+    console.log("Clicked submit")
   }
 
   urlContains(str) {
