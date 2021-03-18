@@ -17,24 +17,24 @@ const util = require('./shared/util');
 function input(field) {
   const inputWrap = `o-form-input-${field}`;
   return $(`${util.se(inputWrap)} input`);
-}
+} 
 
-class CustomSignInPage {
+class OktaSignInPage {
 
   constructor() {
-    this.usernameInput = input('username');
-    this.passwordInput = input('password');
-    this.submitButton = $('[data-type="save"]');
+    this.identifierInput = $('[name="identifier"]');
+    this.passcodeInput = $('[name="credentials.passcode"]');
+    this.nextButton = $('[data-type="save"]');
   }
 
   waitForPageLoad() {
-    return util.wait(this.submitButton);
+    return util.wait(this.identifierInput);
   }
 
   login(username, password) {
-    this.usernameInput.sendKeys(username);
-    this.passwordInput.sendKeys(password);
-    return this.submitButton.click();
+    this.identifierInput.sendKeys(username);
+    this.passcodeInput.sendKeys(password);
+    return this.nextButton.click();
   }
 
   urlContains(str) {
@@ -42,4 +42,4 @@ class CustomSignInPage {
   }
 }
 
-module.exports = CustomSignInPage;
+module.exports = OktaSignInPage;

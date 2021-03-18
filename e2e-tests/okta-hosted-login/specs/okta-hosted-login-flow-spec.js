@@ -13,7 +13,12 @@
 'use strict';
 
 const LoginHomePage = require('../../page-objects/shared/login-home-page');
-const OktaSignInPage = require('../../page-objects/okta-signin-page');
+let OktaSignInPage = require('../../page-objects/okta-signin-page');
+
+if (process.env.ORG_OIE_ENABLED) {
+  OktaSignInPage = require('../../page-objects/okta-oie-signin-page');
+}
+
 const AuthenticatedHomePage = require('../../page-objects/shared/authenticated-home-page');
 const ProfilePage = require('../../page-objects/shared/profile-page');
 const MessagesPage = require('../../page-objects/messages-page');
