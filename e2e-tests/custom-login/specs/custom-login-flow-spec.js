@@ -20,7 +20,10 @@ if (process.env.ORG_OIE_ENABLED) {
 const AuthenticatedHomePage = require('../../page-objects/shared/authenticated-home-page');
 const ProfilePage = require('../../page-objects/shared/profile-page');
 const MessagesPage = require('../../page-objects/messages-page');
+const AuthenticatorsPage = require('../../page-objects/authenticators-page');
+const MFAChallengePage = require('../../page-objects/mfa-challenge-page');
 const url = require('url');
+const axios = require('axios');
 
 describe('Custom Login Flow', () => {
   const loginHomePage = new LoginHomePage();
@@ -28,6 +31,8 @@ describe('Custom Login Flow', () => {
   const authenticatedHomePage = new AuthenticatedHomePage();
   const profile = new ProfilePage();
   const messagesPage = new MessagesPage();
+  const authenticatorsPage = new AuthenticatorsPage();
+  const mfaChallengePage = new MFAChallengePage();
   const appRoot = `http://localhost:${browser.params.appPort}`;
 
   beforeEach(() => {
@@ -83,5 +88,35 @@ describe('Custom Login Flow', () => {
     authenticatedHomePage.waitForPageLoad();
     authenticatedHomePage.logout();
     loginHomePage.waitForPageLoad();
+  });
+
+  it('can login with email authenticator', async () => {
+    // This test runs only on OIE enabled orgs
+    if (!process.env.ORG_OIE_ENABLED) {
+      return;
+    }
+
+    await browser.get(appRoot);
+    await loginHomePage.waitForPageLoad();
+
+    await loginHomePage.clickLoginButton();
+    await customSignInPage.waitForPageLoad();
+
+    const EMAIL_MFA_USERNAME = browser.params.login.email_mfa_username;
+    await customSignInPage.login(EMAIL_MFA_USERNAME, browser.params.login.password);
+
+    await authenticatorsPage.waitForPageLoad();
+    authenticatorsPage.clickAuthenticatorByLabel('Email');
+
+    await mfaChallengePage.waitForPageLoad();
+
+    // Get the email passcode using ghostinspector email API endpoint
+    await axios.get(`https://email.ghostinspector.com/${EMAIL_MFA_USERNAME}/latest`).then((response) => {
+      const emailCode = response.data.match(/Enter a code instead: <b>(\d+)/i)[1];
+      mfaChallengePage.enterPasscode(emailCode);
+      mfaChallengePage.clickSubmitButton();
+    }).catch((err) => {
+      console.log(err);
+    });
   });
 });
