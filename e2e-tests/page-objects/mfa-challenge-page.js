@@ -10,19 +10,32 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 
-const EC = protractor.ExpectedConditions;
-const util = module.exports = {};
+'use strict';
 
-util.wait = (elementFinder) => {
-  return browser.wait(EC.presenceOf(elementFinder));
-};
+const util = require('./shared/util');
 
-util.se = val => `[data-se="${val}"]`;
+class MFAChallengePage {
 
-util.urlContains = (str) => {
-  return EC.urlContains(str)();
+  constructor() {
+    this.passcodeSelector = $('[name="credentials.passcode"]');
+    this.submitButton = $('input[data-type="save"]');
+  }
+
+  waitForPageLoad() {
+    return util.wait(this.passcodeSelector);
+  }
+
+  clickSubmitButton() {
+    this.submitButton.click();
+  }
+
+  enterPasscode(passcode) {
+    this.passcodeSelector.sendKeys(passcode);
+  }
+
+  getEmailPasscode() {
+    util.wait(this.passcodeSelector);
+  }
 }
 
-util.waitTillElementContainsText = (elem, text) => {
-  return browser.wait(EC.textToBePresentInElement(elem, text));
-}
+module.exports = MFAChallengePage;

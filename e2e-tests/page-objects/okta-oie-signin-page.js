@@ -12,6 +12,7 @@
 
 'use strict';
 
+const { browser } = require('protractor');
 const util = require('./shared/util');
 
 function input(field) {
@@ -33,8 +34,18 @@ class OktaSignInPage {
 
   login(username, password) {
     this.identifierInput.sendKeys(username);
-    this.passcodeInput.sendKeys(password);
-    return this.nextButton.click();
+    this.passcodeInput.isPresent().then((present) => {
+      // Idenfitier first flow if passcode input is not present on widget
+      if (!present) {
+        this.nextButton.click();
+        util.wait(this.passcodeInput);
+        this.passcodeInput.sendKeys(password);
+        return this.nextButton.click();
+      } else { // Identifier and passcode on same screen
+        this.passcodeInput.sendKeys(password);
+        return this.nextButton.click();  
+      }
+    });
   }
 
   urlContains(str) {

@@ -34,6 +34,7 @@ commonConfig.configure = function (promises) {
         username: process.env.USER_NAME || process.env.USERNAME,
         password: process.env.PASSWORD,
         email: process.env.USER_NAME || process.env.USERNAME,
+        email_mfa_username: process.env.EMAIL_MFA_USERNAME, // User with email auth MFA
       },
       // App servers start on port 8080 but configurable using env var
       appPort: process.env.PORT || 8080,
@@ -63,7 +64,7 @@ commonConfig.configure = function (promises) {
     capabilities: {
       browserName: 'chrome',
       chromeOptions: { 
-        args: [ "--headless", "--disable-gpu", "--window-size=800,600"] 
+        args: ['--headless', '--disable-gpu', '--window-size=800,600'] 
       }
     }
   };
