@@ -26,6 +26,7 @@ class MFAChallengePage {
   }
 
   clickSubmitButton() {
+    util.wait(this.submitButton);
     this.submitButton.click();
   }
 
