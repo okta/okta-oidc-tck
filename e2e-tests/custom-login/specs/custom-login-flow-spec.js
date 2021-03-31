@@ -102,8 +102,7 @@ describe('Custom Login Flow', () => {
     await loginHomePage.clickLoginButton();
     await customSignInPage.waitForPageLoad();
 
-    const EMAIL_MFA_USERNAME = browser.params.login.email_mfa_username;
-    await customSignInPage.login(EMAIL_MFA_USERNAME, browser.params.login.password);
+    await oktaSignInPage.login(process.env.EMAIL_MFA_USERNAME, process.env.PASSWORD);
 
     await authenticatorsPage.waitForPageLoad();
     authenticatorsPage.clickAuthenticatorByLabel('Email');
@@ -111,9 +110,67 @@ describe('Custom Login Flow', () => {
     await mfaChallengePage.waitForPageLoad();
 
     // Get the email passcode using ghostinspector email API endpoint
-    await axios.get(`https://email.ghostinspector.com/${EMAIL_MFA_USERNAME}/latest`).then((response) => {
+    await axios.get(`https://email.ghostinspector.com/${process.env.EMAIL_MFA_USERNAME}/latest`).then((response) => {
       const emailCode = response.data.match(/Enter a code instead: <b>(\d+)/i)[1];
       mfaChallengePage.enterPasscode(emailCode);
+      mfaChallengePage.clickSubmitButton();
+    }).catch((err) => {
+      console.log(err);
+    });
+  });
+
+  it('can login with SMS authenticator', async () => {
+    // This test runs only on OIE enabled orgs
+    if (!process.env.ORG_OIE_ENABLED) {
+      return;
+    }
+
+    await browser.get(appRoot);
+    await loginHomePage.waitForPageLoad();
+
+    await loginHomePage.clickLoginButton();
+    await oktaSignInPage.waitForPageLoad();
+
+    await oktaSignInPage.login(process.env.SMS_MFA_USERNAME, process.env.PASSWORD);
+
+    await authenticatorsPage.waitForPageLoad();
+    authenticatorsPage.clickAuthenticatorByLabel('Phone');
+    mfaChallengePage.clickSubmitButton();
+
+    // Wait for 5 seconds for SMS to be received
+    await browser.sleep(5000);
+
+    const TWILIO_ACCOUNT = process.env.TWILIO_ACCOUNT;
+    const TWILIO_API_TOKEN = process.env.TWILIO_API_TOKEN;
+
+    // This endpoint returns all the SMSes sent to the twilio test number (shared between multiple orgs)
+    await axios.get(`https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT}/Messages.json`, {
+      auth: {
+        username: `${TWILIO_ACCOUNT}`,
+        password: `${TWILIO_API_TOKEN}`
+      }
+    }).then((response) => {
+      const data = response.data;
+      const size = data.end;
+      
+      // The format of the SMS sent is "Your ${org.name} verification code is ${code}"
+      // The prefix should be based on your org name. Currently it's hardcoded to use the "OIE Widget Testing" org
+      const prefix = 'Your OIE Widget Testing verification code is';
+      const regex = ' (([0-9][0-9][0-9][0-9][0-9][0-9]))';
+      
+      // Loop through all the messages and fetch the one that matches the prefix for your org
+      let messageBody = "";
+      for (var i = 0; i < size; i++) {
+          if (data.messages[i].body.indexOf(prefix) > -1) {
+              messageBody = data.messages[i].body;
+              break;
+          }
+      }
+      
+      const smsCode = messageBody.match(new RegExp(regex))[1];
+
+      mfaChallengePage.waitForPageLoad();
+      mfaChallengePage.enterPasscode(smsCode);
       mfaChallengePage.clickSubmitButton();
     }).catch((err) => {
       console.log(err);
