@@ -119,6 +119,10 @@ describe('Okta Hosted Login Flow', () => {
     }).catch((err) => {
       console.log(err);
     });
+
+    authenticatedHomePage.waitForPageLoad();
+    authenticatedHomePage.logout();
+    loginHomePage.waitForPageLoad();
   });
 
   it('can login with SMS authenticator', async () => {

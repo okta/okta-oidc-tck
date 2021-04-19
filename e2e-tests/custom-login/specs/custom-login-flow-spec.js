@@ -102,7 +102,7 @@ describe('Custom Login Flow', () => {
     await loginHomePage.clickLoginButton();
     await customSignInPage.waitForPageLoad();
 
-    await oktaSignInPage.login(process.env.EMAIL_MFA_USERNAME, process.env.PASSWORD);
+    await customSignInPage.login(process.env.EMAIL_MFA_USERNAME, process.env.PASSWORD);
 
     await authenticatorsPage.waitForPageLoad();
     authenticatorsPage.clickAuthenticatorByLabel('Email');
@@ -117,6 +117,10 @@ describe('Custom Login Flow', () => {
     }).catch((err) => {
       console.log(err);
     });
+
+    authenticatedHomePage.waitForPageLoad();
+    authenticatedHomePage.logout();
+    loginHomePage.waitForPageLoad();
   });
 
   it('can login with SMS authenticator', async () => {
@@ -129,9 +133,9 @@ describe('Custom Login Flow', () => {
     await loginHomePage.waitForPageLoad();
 
     await loginHomePage.clickLoginButton();
-    await oktaSignInPage.waitForPageLoad();
+    await customSignInPage.waitForPageLoad();
 
-    await oktaSignInPage.login(process.env.SMS_MFA_USERNAME, process.env.PASSWORD);
+    await customSignInPage.login(process.env.SMS_MFA_USERNAME, process.env.PASSWORD);
 
     await authenticatorsPage.waitForPageLoad();
     authenticatorsPage.clickAuthenticatorByLabel('Phone');
