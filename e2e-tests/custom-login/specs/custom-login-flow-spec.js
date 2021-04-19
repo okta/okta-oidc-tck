@@ -41,6 +41,11 @@ describe('Custom Login Flow', () => {
       console.log(`Setting default timeout interval to ${process.env.DEFAULT_TIMEOUT_INTERVAL}`)
       jasmine.DEFAULT_TIMEOUT_INTERVAL = process.env.DEFAULT_TIMEOUT_INTERVAL;
     }
+
+    if (!process.env.CODE_WAIT_TIME) {
+      console.log('Setting default wait time for code to 5 seconds')
+      process.env.CODE_WAIT_TIME = 5000;
+    }
   });
 
   afterAll(() => {
@@ -106,8 +111,10 @@ describe('Custom Login Flow', () => {
 
     await authenticatorsPage.waitForPageLoad();
     authenticatorsPage.clickAuthenticatorByLabel('Email');
-
     await mfaChallengePage.waitForPageLoad();
+
+    // Wait for 5 seconds (default) for email to be received
+    await browser.sleep(process.env.CODE_WAIT_TIME);
 
     // Get the email passcode using ghostinspector email API endpoint
     await axios.get(`https://email.ghostinspector.com/${process.env.EMAIL_MFA_USERNAME}/latest`).then((response) => {
@@ -141,8 +148,8 @@ describe('Custom Login Flow', () => {
     authenticatorsPage.clickAuthenticatorByLabel('Phone');
     mfaChallengePage.clickSubmitButton();
 
-    // Wait for 5 seconds for SMS to be received
-    await browser.sleep(5000);
+    // Wait for 5 seconds (default) for SMS to be received
+    await browser.sleep(process.env.CODE_WAIT_TIME);
 
     const TWILIO_ACCOUNT = process.env.TWILIO_ACCOUNT;
     const TWILIO_API_TOKEN = process.env.TWILIO_API_TOKEN;
