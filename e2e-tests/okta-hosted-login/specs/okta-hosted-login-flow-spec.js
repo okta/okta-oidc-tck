@@ -188,6 +188,28 @@ describe('Okta Hosted Login Flow', () => {
     }).catch((err) => {
       console.log(err);
     });
+
+    authenticatedHomePage.waitForPageLoad();
+    authenticatedHomePage.logout();
+    loginHomePage.waitForPageLoad();
+  });
+
+  it('can login with facebook as IdP', () => {
+    // This test runs only on OIE enabled orgs
+    if (!process.env.ORG_OIE_ENABLED) {
+      return;
+    }
+
+    browser.get(appRoot);
+    loginHomePage.waitForPageLoad();
+
+    loginHomePage.clickLoginButton();
+    oktaSignInPage.waitForPageLoad();
+
+    oktaSignInPage.loginFacebook(process.env.FB_USERNAME, process.env.FB_PASSWORD);
+    authenticatedHomePage.waitForPageLoad();
+    authenticatedHomePage.waitForWelcomeTextToLoad();
+    expect(authenticatedHomePage.getUIText()).toContain('Welcome');
   });
 
 });
