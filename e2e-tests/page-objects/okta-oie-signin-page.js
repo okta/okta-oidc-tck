@@ -26,6 +26,10 @@ class OktaSignInPage {
     this.identifierInput = $('[name="identifier"]');
     this.passcodeInput = $('[name="credentials.passcode"]');
     this.nextButton = $('[data-type="save"]');
+    this.facebookLoginButton = $('[data-se="social-auth-facebook-button"]');
+    this.facebookEmail = $('#email');
+    this.facebookPassword = $('#pass');
+    this.facebookSubmitBtn = $('#loginbutton');
   }
 
   waitForPageLoad() {
@@ -46,6 +50,15 @@ class OktaSignInPage {
         return this.nextButton.click();  
       }
     });
+  }
+
+  loginFacebook(username, password) {
+    this.facebookLoginButton.click();
+    util.wait(this.facebookEmail);
+
+    this.facebookEmail.sendKeys(username);
+    this.facebookPassword.sendKeys(password);
+    this.facebookSubmitBtn.click();
   }
 
   urlContains(str) {

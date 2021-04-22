@@ -187,4 +187,23 @@ describe('Custom Login Flow', () => {
       console.log(err);
     });
   });
+
+  it('can login with facebook as IdP', () => {
+    // This test runs only on OIE enabled orgs
+    if (!process.env.ORG_OIE_ENABLED) {
+      return;
+    }
+
+    browser.get(appRoot);
+    loginHomePage.waitForPageLoad();
+
+    loginHomePage.clickLoginButton();
+    customSignInPage.waitForPageLoad();
+
+    customSignInPage.loginFacebook(process.env.FB_USERNAME, process.env.FB_PASSWORD);
+    authenticatedHomePage.waitForPageLoad();
+    authenticatedHomePage.waitForWelcomeTextToLoad();
+    expect(authenticatedHomePage.getUIText()).toContain('Welcome');
+  });
+  
 });
