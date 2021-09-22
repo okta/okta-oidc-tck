@@ -27,8 +27,8 @@ cron () {
 }
 
 deploy () {
-    echo "Deploying SNAPSHOT build"
-    ${MVN_CMD} deploy -Pci
+    echo "Running mvn verify"
+    ${MVN_CMD} verify -Pci
 }
 
 full_build () {
