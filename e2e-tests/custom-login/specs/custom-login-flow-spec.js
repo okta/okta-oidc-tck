@@ -72,27 +72,27 @@ describe('Custom Login Flow', () => {
     expect(authenticatedHomePage.getUIText()).toContain('Welcome');
   });
 
-  it('can access user profile', () => {
-    authenticatedHomePage.viewProfile();
-    profile.waitForPageLoad();
+  it('can access user profile', async () => {
+    await authenticatedHomePage.viewProfile();
+    await profile.waitForPageLoad();
     expect(profile.getEmailClaim()).toBe(browser.params.login.email);
   });
 
-  it('can access resource server messages after login', () => {
+  it('can access resource server messages after login', async () => {
     // If it's not implicit flow, don't test messages resource server
     if (process.env.TEST_TYPE !== 'implicit') {
       return;
     }
-    authenticatedHomePage.viewMessages();
-    messagesPage.waitForPageLoad();
+    await authenticatedHomePage.viewMessages();
+    await messagesPage.waitForPageLoad();
     expect(messagesPage.getMessage()).toBeTruthy();
   });
 
-  it('can log the user out', () => {
-    browser.get(appRoot);
-    authenticatedHomePage.waitForPageLoad();
-    authenticatedHomePage.logout();
-    loginHomePage.waitForPageLoad();
+  it('can log the user out', async () => {
+    await browser.get(appRoot);
+    await authenticatedHomePage.waitForPageLoad();
+    await authenticatedHomePage.logout();
+    await loginHomePage.waitForPageLoad();
   });
 
   it('can login with email authenticator', async () => {
