@@ -54,21 +54,21 @@ describe('Custom Login Flow', () => {
     });
   });
 
-  it('can login with Okta as the IDP using custom signin page', () => {
-    browser.get(appRoot);
-    loginHomePage.waitForPageLoad();
+  it('can login with Okta as the IDP using custom signin page', async () => {
+    await browser.get(appRoot);
+    await loginHomePage.waitForPageLoad();
 
-    loginHomePage.clickLoginButton();
-    customSignInPage.waitForPageLoad();
+    await loginHomePage.clickLoginButton();
+    await customSignInPage.waitForPageLoad();
 
     // Verify that current domain hasn't changed to okta-hosted login, rather a local custom login page
     const urlProperties = url.parse(process.env.ISSUER);
     expect(browser.getCurrentUrl()).not.toContain(urlProperties.host);
     expect(browser.getCurrentUrl()).toContain(appRoot);
 
-    customSignInPage.login(browser.params.login.username, browser.params.login.password);
-    authenticatedHomePage.waitForPageLoad();
-    authenticatedHomePage.waitForWelcomeTextToLoad();
+    await customSignInPage.login(browser.params.login.username, browser.params.login.password);
+    await authenticatedHomePage.waitForPageLoad();
+    await authenticatedHomePage.waitForWelcomeTextToLoad();
     expect(authenticatedHomePage.getUIText()).toContain('Welcome');
   });
 
