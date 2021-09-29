@@ -23,7 +23,7 @@ class MFAChallengePage {
   }
 
   waitForPageLoad() {
-    return util.wait(this.enterAuthCodeLink);
+    return util.wait(this.passcodeSelector);
   }
 
   clickEnterAuthCodeLink() {
