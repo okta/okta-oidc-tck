@@ -17,12 +17,17 @@ const util = require('./shared/util');
 class MFAChallengePage {
 
   constructor() {
+    this.enterAuthCodeLink = $('button.enter-auth-code-instead-link');
     this.passcodeSelector = $('[name="credentials.passcode"]');
     this.submitButton = $('input[data-type="save"]');
   }
 
   waitForPageLoad() {
-    return util.wait(this.passcodeSelector);
+    return util.wait(this.enterAuthCodeLink);
+  }
+
+  clickEnterAuthCodeLink() {
+    return this.enterAuthCodeLink.click();
   }
 
   clickSubmitButton() {
@@ -31,6 +36,7 @@ class MFAChallengePage {
   }
 
   enterPasscode(passcode) {
+    util.wait(this.passcodeSelector);
     this.passcodeSelector.sendKeys(passcode);
   }
 
