@@ -110,8 +110,9 @@ describe('Custom Login Flow', () => {
     await customSignInPage.login(process.env.EMAIL_MFA_USERNAME, process.env.PASSWORD);
 
     await authenticatorsPage.waitForPageLoad();
-    authenticatorsPage.clickAuthenticatorByLabel('Email');
+    await authenticatorsPage.clickAuthenticatorByLabel('Email');
     await mfaChallengePage.waitForPageLoad();
+    await mfaChallengePage.clickEnterAuthCodeLink();
 
     // Wait for 5 seconds (default) for email to be received
     await browser.sleep(process.env.CODE_WAIT_TIME);
