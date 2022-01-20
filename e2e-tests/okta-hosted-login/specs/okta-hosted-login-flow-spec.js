@@ -97,7 +97,7 @@ describe('Okta Hosted Login Flow', () => {
     loginHomePage.waitForPageLoad();
   });
 
-  it('can login with email authenticator', async () => {
+  xit('can login with email authenticator', async () => {
     // This test runs only on OIE enabled orgs
     if (!process.env.ORG_OIE_ENABLED) {
       return;
@@ -133,7 +133,7 @@ describe('Okta Hosted Login Flow', () => {
     loginHomePage.waitForPageLoad();
   });
 
-  it('can login with SMS authenticator', async () => {
+  xit('can login with SMS authenticator', async () => {
     // This test runs only on OIE enabled orgs
     if (!process.env.ORG_OIE_ENABLED) {
       return;
@@ -195,7 +195,7 @@ describe('Okta Hosted Login Flow', () => {
     loginHomePage.waitForPageLoad();
   });
 
-  it('can login with facebook as IdP', () => {
+  xit('can login with facebook as IdP', () => {
     // This test runs only on OIE enabled orgs
     if (!process.env.ORG_OIE_ENABLED) {
       return;
