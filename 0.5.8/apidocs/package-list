@@ -1,1 +1,6 @@
 com.okta.test.mock
+com.okta.test.mock.application
+com.okta.test.mock.matchers
+com.okta.test.mock.scenarios
+com.okta.test.mock.tests
+com.okta.test.mock.wiremock
