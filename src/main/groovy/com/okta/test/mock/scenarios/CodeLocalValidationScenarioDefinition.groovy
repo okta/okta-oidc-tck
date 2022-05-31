@@ -25,6 +25,7 @@ import org.apache.commons.codec.binary.Base64
 import java.nio.charset.StandardCharsets
 import java.security.KeyPair
 import java.security.KeyPairGenerator
+import java.security.interfaces.RSAPublicKey
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.regex.Pattern
@@ -56,9 +57,10 @@ class CodeLocalValidationScenarioDefinition implements ScenarioDefinition {
         keyPairGenerator.initialize(4096)
         KeyPair invalidKeyPair = keyPairGenerator.generateKeyPair()
         KeyPair keyPair = keyPairGenerator.generateKeyPair()
+        RSAPublicKey rsaPublicKey = keyPair.getPublic()
 
-        pubKeyE = Base64.encodeBase64URLSafeString(TestUtils.toIntegerBytes(keyPair.publicKey.getPublicExponent()))
-        pubKeyN = Base64.encodeBase64URLSafeString(TestUtils.toIntegerBytes(keyPair.publicKey.getModulus()))
+        pubKeyE = Base64.encodeBase64URLSafeString(TestUtils.toIntegerBytes(rsaPublicKey.getPublicExponent()))
+        pubKeyN = Base64.encodeBase64URLSafeString(TestUtils.toIntegerBytes(rsaPublicKey.getModulus()))
 
         Instant now = Instant.now()
         accessTokenJwt =  Jwts.builder()
