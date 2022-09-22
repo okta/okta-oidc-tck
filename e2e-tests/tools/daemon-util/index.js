@@ -21,7 +21,7 @@ const { execSync } = require('child_process');
 
 const daemonUtil = module.exports;
 
-function startNpmScript(script, color, env) {
+function startNpmScript(script, color, env, waitForMessage) {
   const command = env ? `${env} npm run` : 'npm run'
   const child = new Monitor(script, {
     command,
@@ -57,7 +57,14 @@ function startNpmScript(script, color, env) {
 
   return new Promise((resolve, reject) => {
     child.on('start', () => {
-      resolve(child);
+      if (!waitForMessage) {
+        resolve(child);
+      }
+    });
+    child.on('stdout', (msg) => {
+      if (waitForMessage && msg.indexOf(waitForMessage) != -1) {
+        resolve(child);
+      }
     });
     console.log(normal(`Running "npm run ${script}"`));
     try {
@@ -90,7 +97,7 @@ function waitOnPromise(opts, context) {
 }
 
 function startAndWait(opts) {
-  return startNpmScript(opts.script, opts.color, opts.env)
+  return startNpmScript(opts.script, opts.color, opts.env, opts.waitForMessage)
   .then(child => waitOnPromise({
     resources: opts.resources,
   }, opts)
@@ -129,7 +136,8 @@ daemonUtil.startOktaHostedLoginServer = () => startAndWait({
   resources: [
     `tcp:8080`,
   ],
-  env: 'BROWSER=none'
+  env: 'BROWSER=none',
+  waitForMessage: process.env.WAIT_FOR_MESSAGE
 });
 
 daemonUtil.startCustomLoginServer = () => startAndWait({
@@ -138,7 +146,8 @@ daemonUtil.startCustomLoginServer = () => startAndWait({
   resources: [
     `tcp:8080`,
   ],
-  env: 'BROWSER=none'
+  env: 'BROWSER=none',
+  waitForMessage: process.env.WAIT_FOR_MESSAGE
 });
 
 daemonUtil.startResourceServer = () => startAndWait({
