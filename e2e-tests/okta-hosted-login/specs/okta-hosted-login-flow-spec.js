@@ -56,45 +56,45 @@ describe('Okta Hosted Login Flow', () => {
     });
   });
 
-  it('can login with Okta as the IDP', () => {   
-    browser.get(appRoot);
-    loginHomePage.waitForPageLoad();
+  it('can login with Okta as the IDP', async () => {
+    await browser.get(appRoot);
+    await loginHomePage.waitForPageLoad();
 
-    loginHomePage.clickLoginButton();
-    oktaSignInPage.waitForPageLoad();
+    await loginHomePage.clickLoginButton();
+    await oktaSignInPage.waitForPageLoad();
 
     // Verify that current domain has changed to okta-hosted login page
     const urlProperties = url.parse(process.env.ISSUER);
     expect(browser.getCurrentUrl()).toContain(urlProperties.host);
     expect(browser.getCurrentUrl()).not.toContain(appRoot);
 
-    oktaSignInPage.login(browser.params.login.username, browser.params.login.password);
-    authenticatedHomePage.waitForPageLoad();
-    authenticatedHomePage.waitForWelcomeTextToLoad();
-    expect(authenticatedHomePage.getUIText()).toContain('Welcome');
+    await oktaSignInPage.login(browser.params.login.username, browser.params.login.password);
+    await authenticatedHomePage.waitForPageLoad();
+    await authenticatedHomePage.waitForWelcomeTextToLoad();
+    expect(await authenticatedHomePage.getUIText()).toContain('Welcome');
   });
 
-  it('can access user profile', () => {
-    authenticatedHomePage.viewProfile();
-    profile.waitForPageLoad();
-    expect(profile.getEmailClaim()).toBe(browser.params.login.email);
+  it('can access user profile', async () => {
+    await authenticatedHomePage.viewProfile();
+    await profile.waitForPageLoad();
+    expect(await profile.getEmailClaim()).toBe(browser.params.login.email);
   });
 
-  it('can access resource server messages after login', () => {
+  it('can access resource server messages after login', async () => {
     // If it's not implicit flow, don't test messages resource server
     if (process.env.TEST_TYPE !== 'implicit') {
       return;
     }
-    authenticatedHomePage.viewMessages();
-    messagesPage.waitForPageLoad();
-    expect(messagesPage.getMessage()).toBeTruthy();
+    await authenticatedHomePage.viewMessages();
+    await messagesPage.waitForPageLoad();
+    expect(await messagesPage.getMessage()).toBeTruthy();
   });
 
-  it('can log the user out', () => {
-    browser.get(appRoot);
-    authenticatedHomePage.waitForPageLoad();
-    authenticatedHomePage.logout();
-    loginHomePage.waitForPageLoad();
+  it('can log the user out', async () => {
+    await browser.get(appRoot);
+    await authenticatedHomePage.waitForPageLoad();
+    await authenticatedHomePage.logout();
+    await loginHomePage.waitForPageLoad();
   });
 
   xit('can login with email authenticator', async () => {
