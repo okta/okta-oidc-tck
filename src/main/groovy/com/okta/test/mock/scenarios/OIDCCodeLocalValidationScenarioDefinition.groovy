@@ -27,6 +27,7 @@ import org.apache.commons.codec.binary.Base64
 import java.nio.charset.StandardCharsets
 import java.security.KeyPair
 import java.security.KeyPairGenerator
+import java.security.interfaces.RSAPublicKey
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.function.Function
@@ -72,8 +73,10 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
         KeyPair invalidKeyPair = keyPairGenerator.generateKeyPair()
         KeyPair keyPair = keyPairGenerator.generateKeyPair()
 
-        pubKeyE = Base64.encodeBase64URLSafeString(TestUtils.toIntegerBytes(keyPair.publicKey.getPublicExponent()))
-        pubKeyN = Base64.encodeBase64URLSafeString(TestUtils.toIntegerBytes(keyPair.publicKey.getModulus()))
+        RSAPublicKey rsaPublicKey = keyPair.getPublic()
+
+        pubKeyE = Base64.encodeBase64URLSafeString(TestUtils.toIntegerBytes(rsaPublicKey.getPublicExponent()))
+        pubKeyN = Base64.encodeBase64URLSafeString(TestUtils.toIntegerBytes(rsaPublicKey.getModulus()))
 
         Instant now = Instant.now()
         accessTokenJwt =  Jwts.builder()
@@ -85,7 +88,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
                 .setHeader(Jwts.jwsHeader()
                 .setKeyId('TEST_PUB_KEY_ID'))
-                .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
+                .signWith(SignatureAlgorithm.RS256, keyPair.getPrivate())
                 .compact()
 
         accessTokenWithGroupsJwt =  Jwts.builder()
@@ -98,7 +101,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
                 .setHeader(Jwts.jwsHeader()
                 .setKeyId('TEST_PUB_KEY_ID'))
-                .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
+                .signWith(SignatureAlgorithm.RS256, keyPair.getPrivate())
                 .compact()
 
         idTokenJwtBuilder =  Jwts.builder()
@@ -113,7 +116,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
                 .setHeader(Jwts.jwsHeader()
                 .setKeyId('TEST_PUB_KEY_ID'))
-                .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
+                .signWith(SignatureAlgorithm.RS256, keyPair.getPrivate())
 
         idTokenWithGroupsJwtBuilder =  Jwts.builder()
                 .setSubject("00uid4BxXw6I6TV4m0g3")
@@ -128,7 +131,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
                 .setHeader(Jwts.jwsHeader()
                 .setKeyId('TEST_PUB_KEY_ID'))
-                .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
+                .signWith(SignatureAlgorithm.RS256, keyPair.getPrivate())
 
         wrongKeyIdIdTokenJwtBuilder =  Jwts.builder()
                 .setSubject("00uid4BxXw6I6TV4m0g3")
@@ -142,7 +145,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
                 .setHeader(Jwts.jwsHeader()
                 .setKeyId('WRONG_TEST_PUB_KEY_ID'))
-                .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
+                .signWith(SignatureAlgorithm.RS256, keyPair.getPrivate())
 
         wrongAudienceIdTokenJwtBuilder =  Jwts.builder()
                 .setSubject("00uid4BxXw6I6TV4m0g3")
@@ -156,7 +159,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
                 .setHeader(Jwts.jwsHeader()
                 .setKeyId('TEST_PUB_KEY_ID'))
-                .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
+                .signWith(SignatureAlgorithm.RS256, keyPair.getPrivate())
 
         issuedInFutureIdTokenJwtBuilder =  Jwts.builder()
                 .setSubject("00uid4BxXw6I6TV4m0g3")
@@ -170,7 +173,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
                 .setHeader(Jwts.jwsHeader()
                 .setKeyId('TEST_PUB_KEY_ID'))
-                .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
+                .signWith(SignatureAlgorithm.RS256, keyPair.getPrivate())
 
         expiredIdTokenJwtBuilder =  Jwts.builder()
                 .setSubject("00uid4BxXw6I6TV4m0g3")
@@ -185,7 +188,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
 
                 .setHeader(Jwts.jwsHeader()
                 .setKeyId('TEST_PUB_KEY_ID'))
-                .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
+                .signWith(SignatureAlgorithm.RS256, keyPair.getPrivate())
 
         invalidSignatureIdTokenJwtBuilder =  Jwts.builder()
                 .setSubject("00uid4BxXw6I6TV4m0g3")
@@ -199,7 +202,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
                 .setHeader(Jwts.jwsHeader()
                 .setKeyId('TEST_PUB_KEY_ID'))
-                .signWith(SignatureAlgorithm.RS256, invalidKeyPair.privateKey)
+                .signWith(SignatureAlgorithm.RS256, invalidKeyPair.getPrivate())
 
         invalidIssuerIdTokenJwtBuilder =  Jwts.builder()
                 .setSubject("00uid4BxXw6I6TV4m0g3")
@@ -213,7 +216,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
                 .setHeader(Jwts.jwsHeader()
                 .setKeyId('TEST_PUB_KEY_ID'))
-                .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
+                .signWith(SignatureAlgorithm.RS256, keyPair.getPrivate())
 
         invalidNotBeforeIdTokenJwtBuilder =  Jwts.builder()
                 .setSubject("00uid4BxXw6I6TV4m0g3")
@@ -227,7 +230,7 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
                 .setHeader(Jwts.jwsHeader()
                 .setKeyId('TEST_PUB_KEY_ID'))
-                .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
+                .signWith(SignatureAlgorithm.RS256, keyPair.getPrivate())
 
         unsignedIdTokenJwtBuilder =  Jwts.builder()
                 .setSubject("00uid4BxXw6I6TV4m0g3")

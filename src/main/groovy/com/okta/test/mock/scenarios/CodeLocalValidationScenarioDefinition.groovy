@@ -72,7 +72,7 @@ class CodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
                 .setHeader(Jwts.jwsHeader()
                 .setKeyId('TEST_PUB_KEY_ID'))
-                .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
+                .signWith(SignatureAlgorithm.RS256, keyPair.getPrivate())
                 .compact()
 
         wrongKeyIdAccessTokenJwt =  Jwts.builder()
@@ -84,7 +84,7 @@ class CodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
                 .setHeader(Jwts.jwsHeader()
                 .setKeyId('WRONG_TEST_PUB_KEY_ID'))
-                .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
+                .signWith(SignatureAlgorithm.RS256, keyPair.getPrivate())
                 .compact()
 
         wrongScopeAccessTokenJwt =  Jwts.builder()
@@ -96,7 +96,7 @@ class CodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
                 .setHeader(Jwts.jwsHeader()
                 .setKeyId('TEST_PUB_KEY_ID'))
-                .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
+                .signWith(SignatureAlgorithm.RS256, keyPair.getPrivate())
                 .compact()
 
         wrongAudienceAccessTokenJwt =  Jwts.builder()
@@ -108,7 +108,7 @@ class CodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
                 .setHeader(Jwts.jwsHeader()
                 .setKeyId('TEST_PUB_KEY_ID'))
-                .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
+                .signWith(SignatureAlgorithm.RS256, keyPair.getPrivate())
                 .compact()
 
         invalidSignatureAccessTokenJwt =  Jwts.builder()
@@ -121,7 +121,7 @@ class CodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
                 .setHeader(Jwts.jwsHeader()
                 .setKeyId('TEST_PUB_KEY_ID'))
-                .signWith(SignatureAlgorithm.RS256, invalidKeyPair.private)
+                .signWith(SignatureAlgorithm.RS256, invalidKeyPair.getPrivate())
                 .compact()
 
         idTokenJwt =  Jwts.builder()
@@ -136,7 +136,7 @@ class CodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
                 .setHeader(Jwts.jwsHeader()
                 .setKeyId('TEST_PUB_KEY_ID'))
-                .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
+                .signWith(SignatureAlgorithm.RS256, keyPair.getPrivate())
                 .compact()
     }
 
