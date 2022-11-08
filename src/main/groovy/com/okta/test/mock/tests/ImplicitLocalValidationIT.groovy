@@ -19,13 +19,12 @@ import com.okta.test.mock.Scenario
 import com.okta.test.mock.application.ApplicationTestRunner
 import io.restassured.http.ContentType
 import org.hamcrest.Matcher
-import org.hamcrest.Matchers
 import org.testng.annotations.Test
 
-import static org.hamcrest.Matchers.hasItems
-import static io.restassured.RestAssured.given
-import static org.hamcrest.Matchers.startsWith
 import static com.okta.test.mock.scenarios.Scenario.IMPLICIT_FLOW_LOCAL_VALIDATION
+import static io.restassured.RestAssured.given
+import static org.hamcrest.Matchers.hasItems
+import static org.hamcrest.Matchers.startsWith
 
 @Scenario(IMPLICIT_FLOW_LOCAL_VALIDATION)
 class ImplicitLocalValidationIT extends ApplicationTestRunner {

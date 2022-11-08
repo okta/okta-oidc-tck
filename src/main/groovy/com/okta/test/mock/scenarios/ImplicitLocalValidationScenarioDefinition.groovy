@@ -22,6 +22,7 @@ import io.jsonwebtoken.SignatureAlgorithm
 
 import java.security.KeyPair
 import java.security.KeyPairGenerator
+import java.security.interfaces.RSAPublicKey
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import org.apache.commons.codec.binary.Base64
@@ -59,9 +60,10 @@ class ImplicitLocalValidationScenarioDefinition implements ScenarioDefinition {
 
         KeyPair keyPair = keyPairGenerator.generateKeyPair()
 
-        pubKeyE = Base64.encodeBase64URLSafeString(TestUtils.toIntegerBytes(keyPair.publicKey.getPublicExponent()))
-        pubKeyN = Base64.encodeBase64URLSafeString(TestUtils.toIntegerBytes(keyPair.publicKey.getModulus()))
+        RSAPublicKey rsaPublicKey = keyPair.getPublic()
 
+        pubKeyE = Base64.encodeBase64URLSafeString(TestUtils.toIntegerBytes(rsaPublicKey.getPublicExponent()))
+        pubKeyN = Base64.encodeBase64URLSafeString(TestUtils.toIntegerBytes(rsaPublicKey.getModulus()))
 
         Instant now = Instant.now()
         accessTokenJwt =  Jwts.builder()
@@ -75,7 +77,7 @@ class ImplicitLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
                 .setHeader(Jwts.jwsHeader()
                 .setKeyId('TEST_PUB_KEY_ID'))
-                .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
+                .signWith(SignatureAlgorithm.RS256, keyPair.getPrivate())
                 .compact()
 
         inactiveAccessTokenJwt =  Jwts.builder()
@@ -89,7 +91,7 @@ class ImplicitLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
                 .setHeader(Jwts.jwsHeader()
                 .setKeyId('TEST_PUB_KEY_ID'))
-                .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
+                .signWith(SignatureAlgorithm.RS256, keyPair.getPrivate())
                 .compact()
 
         expiredAccessTokenJwt =  Jwts.builder()
@@ -103,7 +105,7 @@ class ImplicitLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .setExpiration(Date.from(now.minus(1, ChronoUnit.HOURS)))
                 .setHeader(Jwts.jwsHeader()
                 .setKeyId('TEST_PUB_KEY_ID'))
-                .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
+                .signWith(SignatureAlgorithm.RS256, keyPair.getPrivate())
                 .compact()
 
         wrongScopeAccessTokenJwt =  Jwts.builder()
@@ -117,7 +119,7 @@ class ImplicitLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
                 .setHeader(Jwts.jwsHeader()
                 .setKeyId('TEST_PUB_KEY_ID'))
-                .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
+                .signWith(SignatureAlgorithm.RS256, keyPair.getPrivate())
                 .compact()
 
         invalidAccessTokenJwt =  Jwts.builder()
@@ -131,7 +133,7 @@ class ImplicitLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
                 .setHeader(Jwts.jwsHeader()
                 .setKeyId('TEST_PUB_KEY_ID'))
-                .signWith(SignatureAlgorithm.RS256, invalidKeyPair.private)
+                .signWith(SignatureAlgorithm.RS256, invalidKeyPair.getPrivate())
                 .compact()
 
         wrongAudienceAccessTokenJwt =  Jwts.builder()
@@ -145,7 +147,7 @@ class ImplicitLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
                 .setHeader(Jwts.jwsHeader()
                 .setKeyId('TEST_PUB_KEY_ID'))
-                .signWith(SignatureAlgorithm.RS256, keyPair.private)
+                .signWith(SignatureAlgorithm.RS256, keyPair.getPrivate())
                 .compact()
 
         idTokenjwt =  Jwts.builder()
@@ -160,7 +162,7 @@ class ImplicitLocalValidationScenarioDefinition implements ScenarioDefinition {
                 .setExpiration(Date.from(now.plus(1, ChronoUnit.HOURS)))
                 .setHeader(Jwts.jwsHeader()
                 .setKeyId('TEST_PUB_KEY_ID'))
-                .signWith(SignatureAlgorithm.RS256, keyPair.privateKey)
+                .signWith(SignatureAlgorithm.RS256, keyPair.getPrivate())
                 .compact()
 
         bindingMap.putAll([
