@@ -42,8 +42,6 @@ import static org.hamcrest.text.MatchesPattern.matchesPattern
 @Scenario(OIDC_FLOW_NONE_RESPONSE_TYPE_VALIDATION)
 class OIDCNoneResponseTypeFlowLocalValidationIT extends BaseValidationIT {
 
-    private def redirectUriPath = Config.Global.codeFlowRedirectPath
-
     @Test
     ExtractableResponse redirectToRemoteLogin() {
 
