@@ -279,6 +279,16 @@ class OIDCCodeLocalValidationScenarioDefinition implements ScenarioDefinition {
                         .withBody("<html>fake_login_page<html/>")))
 
         wireMockServer.stubFor(
+                get(urlPathEqualTo("/oauth2/default/v1/authorize"))
+                        .withQueryParam("client_id", matching(clientId))
+                        .withQueryParam("redirect_uri", matching(Pattern.quote("http://localhost:")+ "\\d+${redirectUriPath}"))
+                        .withQueryParam("response_type", matching("none"))
+                        .withQueryParam("state", matching(".{6,}"))
+                        .willReturn(aResponse()
+                                .withStatus(200)
+                                .withBody("<html>no_token_requested<html/>")))
+
+        wireMockServer.stubFor(
                 post(urlPathEqualTo("/oauth2/default/v1/token"))
                         .withHeader("Authorization", equalTo(authHeader))
                         .withRequestBody(containing("grant_type=authorization_code"))
