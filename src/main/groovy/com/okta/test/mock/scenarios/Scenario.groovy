@@ -23,7 +23,8 @@ enum Scenario {
     CUSTOM_CODE_FLOW_REMOTE_VALIDATION("custom-code-flow-remote-validation", new CodeRemoteValidationScenarioDefinition()),
     IMPLICIT_FLOW_LOCAL_VALIDATION("implicit-flow-local-validation", new ImplicitLocalValidationScenarioDefinition()),
     IMPLICIT_FLOW_REMOTE_VALIDATION("implicit-flow-remote-validation", new ImplicitRemoteValidationScenarioDefinition()),
-    OIDC_CODE_FLOW_LOCAL_VALIDATION("oidc-code-flow-local-validation", new OIDCCodeLocalValidationScenarioDefinition())
+    OIDC_CODE_FLOW_LOCAL_VALIDATION("oidc-code-flow-local-validation", new OIDCCodeLocalValidationScenarioDefinition()),
+    OIDC_FLOW_NONE_RESPONSE_TYPE_VALIDATION("oidc-flow-none-response-type-validation", new OIDCNoneResponseTypeValidationScenarioDefinition())
 
     static Map<String, Scenario> LOOKUP_MAP = new HashMap<>()
     static {
@@ -35,6 +36,7 @@ enum Scenario {
         LOOKUP_MAP.put( IMPLICIT_FLOW_LOCAL_VALIDATION.id, IMPLICIT_FLOW_LOCAL_VALIDATION)
         LOOKUP_MAP.put( IMPLICIT_FLOW_REMOTE_VALIDATION.id, IMPLICIT_FLOW_REMOTE_VALIDATION)
         LOOKUP_MAP.put( OIDC_CODE_FLOW_LOCAL_VALIDATION.id, OIDC_CODE_FLOW_LOCAL_VALIDATION)
+        LOOKUP_MAP.put( OIDC_FLOW_NONE_RESPONSE_TYPE_VALIDATION.id, OIDC_FLOW_NONE_RESPONSE_TYPE_VALIDATION)
     }
 
     private final String id
