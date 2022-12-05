@@ -29,7 +29,7 @@ class OIDCNoneResponseTypeValidationScenarioDefinition implements ScenarioDefini
     @Override
     void configureHttpMock(WireMockServer wireMockServer, String baseUrl) {
 
-        def redirectUriPath = Config.Global.codeFlowRedirectPath
+        def redirectUriPath = Config.Global.enrollmentFlowCallbackPath
 
         wireMockServer.stubFor(
                 get("/oauth2/default/.well-known/openid-configuration")
@@ -40,9 +40,9 @@ class OIDCNoneResponseTypeValidationScenarioDefinition implements ScenarioDefini
 
         wireMockServer.stubFor(
                 get(urlPathEqualTo("/oauth2/default/v1/authorize"))
+                        .withQueryParam("response_type", matching("none"))
                         .withQueryParam("client_id", matching(clientId))
                         .withQueryParam("redirect_uri", matching(Pattern.quote("http://localhost:")+ "\\d+${redirectUriPath}"))
-                        .withQueryParam("response_type", matching("none"))
                         .withQueryParam("state", matching(".{6,}"))
                         .willReturn(aResponse()
                                 .withStatus(200)
