@@ -27,6 +27,10 @@ class Config {
         static String getCodeFlowRedirectPath() {
             return getConfigProperty("codeFlow.redirectPath", "/authorization-code/callback")
         }
+
+        static String getEnrollmentFlowCallbackPath() {
+            return getConfigProperty("enrollmentFlow.CallbackPath", "/enrollment/callback")
+        }
     }
 }
 
