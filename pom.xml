@@ -91,8 +91,8 @@
         </dependency>
         <dependency>
             <groupId>com.github.tomakehurst</groupId>
-            <artifactId>wiremock-jre8</artifactId>
-            <version>2.35.0</version>
+            <artifactId>wiremock-standalone</artifactId>
+            <version>3.0.0-beta-2</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-logging</groupId>
