@@ -20,7 +20,7 @@
     <parent>
         <groupId>com.okta</groupId>
         <artifactId>okta-parent</artifactId>
-        <version>25</version>
+        <version>26</version>
         <relativePath>../okta-java-parent</relativePath>
     </parent>
 
@@ -81,6 +81,7 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
+            <version>7.7.1</version>
             <scope>compile</scope>
             <exclusions>
                 <exclusion>
@@ -160,6 +161,7 @@
                 <plugin>
                     <groupId>org.owasp</groupId>
                     <artifactId>dependency-check-maven</artifactId>
+                    <version>8.0.0</version>
                     <configuration>
                         <!-- no way to exclude some of these issues, and this is only a test lib -->
                         <retireJsAnalyzerEnabled>false</retireJsAnalyzerEnabled>
