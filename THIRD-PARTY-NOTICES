@@ -14,66 +14,21 @@ limitations under the License.
 
 This project includes:
   Apache Commons Codec under Apache License, Version 2.0
-  Apache Commons FileUpload under Apache License, Version 2.0
-  Apache Commons IO under Apache License, Version 2.0
   Apache Commons Lang under Apache License, Version 2.0
   Apache Groovy under The Apache Software License, Version 2.0
   Apache HttpClient under Apache License, Version 2.0
   Apache HttpClient Mime under Apache License, Version 2.0
-  Apache HttpComponents Core HTTP/1.1 under Apache License, Version 2.0
-  Apache HttpComponents Core HTTP/2 under Apache License, Version 2.0
   Apache HttpCore under Apache License, Version 2.0
-  asm under BSD-3-Clause
-  ASM based accessors helper used by json-smart under The Apache Software License, Version 2.0
-  Checker Qual under The MIT License
-  error-prone annotations under Apache 2.0
   FindBugs-jsr305 under The Apache Software License, Version 2.0
-  Guava InternalFutureFailureAccess and InternalFutures under The Apache Software License, Version 2.0
-  Guava ListenableFuture only under The Apache Software License, Version 2.0
-  Guava: Google Core Libraries for Java under Apache License, Version 2.0
   Hamcrest under BSD License 3
-  Hamcrest Core under BSD License 3
-  Handlebars under The Apache Software License, Version 2.0
-  Handlebars Helpers under The Apache Software License, Version 2.0
-  J2ObjC Annotations under The Apache Software License, Version 2.0
   Jackson-annotations under The Apache Software License, Version 2.0
   Jackson-core under The Apache Software License, Version 2.0
   jackson-databind under The Apache Software License, Version 2.0
-  Java Servlet API under CDDL + GPLv2 with classpath exception
   jcommander under Apache License, Version 2.0
-  Jetty :: ALPN :: Client under Apache Software License - Version 2.0 or Eclipse Public License - Version 1.0
-  Jetty :: ALPN :: JDK9 Client Implementation under Apache Software License - Version 2.0 or Eclipse Public License - Version 1.0
-  Jetty :: ALPN :: JDK9 Server Implementation under Apache Software License - Version 2.0 or Eclipse Public License - Version 1.0
-  Jetty :: ALPN :: OpenJDK8 Client Implementation under Apache Software License - Version 2.0 or Eclipse Public License - Version 1.0
-  Jetty :: ALPN :: OpenJDK8 Server Implementation under Apache Software License - Version 2.0 or Eclipse Public License - Version 1.0
-  Jetty :: ALPN :: Server under Apache Software License - Version 2.0 or Eclipse Public License - Version 1.0
-  Jetty :: Asynchronous HTTP Client under Apache Software License - Version 2.0 or Eclipse Public License - Version 1.0
-  Jetty :: Continuation under Apache Software License - Version 2.0 or Eclipse Public License - Version 1.0
-  Jetty :: Http Utility under Apache Software License - Version 2.0 or Eclipse Public License - Version 1.0
-  Jetty :: HTTP2 :: Common under Apache Software License - Version 2.0 or Eclipse Public License - Version 1.0
-  Jetty :: HTTP2 :: HPACK under Apache Software License - Version 2.0 or Eclipse Public License - Version 1.0
-  Jetty :: HTTP2 :: Server under Apache Software License - Version 2.0 or Eclipse Public License - Version 1.0
-  Jetty :: IO Utility under Apache Software License - Version 2.0 or Eclipse Public License - Version 1.0
-  Jetty :: Proxy under Apache Software License - Version 2.0 or Eclipse Public License - Version 1.0
-  Jetty :: Security under Apache Software License - Version 2.0 or Eclipse Public License - Version 1.0
-  Jetty :: Server Core under Apache Software License - Version 2.0 or Eclipse Public License - Version 1.0
-  Jetty :: Servlet Handling under Apache Software License - Version 2.0 or Eclipse Public License - Version 1.0
-  Jetty :: Utilities under Apache Software License - Version 2.0 or Eclipse Public License - Version 1.0
-  Jetty :: Utilities :: Ajax(JSON) under Apache Software License - Version 2.0 or Eclipse Public License - Version 1.0
-  Jetty :: Utility Servlets and Filters under Apache Software License - Version 2.0 or Eclipse Public License - Version 1.0
-  Jetty :: Webapp Application Support under Apache Software License - Version 2.0 or Eclipse Public License - Version 1.0
-  Jetty :: XML utilities under Apache Software License - Version 2.0 or Eclipse Public License - Version 1.0
   JJWT :: API under Apache License, Version 2.0
   JJWT :: Extensions :: Jackson under Apache License, Version 2.0
   JJWT :: Impl under Apache License, Version 2.0
-  JOpt Simple under The MIT License
-  JSON Small and Fast Parser under The Apache Software License, Version 2.0
   json-path under Apache 2.0
-  json-unit-core under The Apache Software License, Version 2.0
-  org.xmlunit:xmlunit-core under The Apache Software License, Version 2.0
-  org.xmlunit:xmlunit-legacy under The BSD 3-Clause License
-  org.xmlunit:xmlunit-placeholders under The Apache Software License, Version 2.0
-  project ':json-path' under The Apache Software License, Version 2.0
   REST Assured under Apache 2.0
   rest-assured-common under Apache 2.0
   SLF4J API Module under MIT License
