@@ -26,7 +26,7 @@ The protractor tests have the following npm dependencies -
 ```json
 "dotenv": "^5.0.1",
 "find-process": "^1.1.0",
-"forever-monitor": "^1.7.1",
+"pm2": "^5.2.2",
 "jasmine-reporters": "^2.2.0",
 "platform": "^1.3.5",
 "protractor": "^5.1.0",

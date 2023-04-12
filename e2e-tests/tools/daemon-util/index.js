@@ -12,7 +12,7 @@
 
 /* eslint no-console:0 */
 
-const Monitor = require('forever-monitor').Monitor;
+const Monitor = require('pm2').Monitor;
 const waitOn = require('wait-on');
 const chalk = require('chalk');
 const find = require('find-process');
