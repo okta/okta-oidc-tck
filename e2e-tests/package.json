@@ -2,6 +2,6 @@
   "name": "@okta/okta-oidc-tck.e2s-tests",
   "private": "true",
   "dependencies": {
-    "forever-monitor": "3.0.3"
+    "pm2": "^5.2.2"
   }
 }
