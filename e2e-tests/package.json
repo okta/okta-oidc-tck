@@ -2,7 +2,7 @@
   "name": "@okta/okta-oidc-tck.e2s-tests",
   "private": "true",
   "resolutions": {
-    "axios": "^1.6.0",
+    "axios": "^1.6.3",
     "semver": "^7.5.2",
     "systeminformation": "^5.21.7",
     "word-wrap": "^1.2.4",
