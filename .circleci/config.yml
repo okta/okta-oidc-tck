@@ -49,9 +49,7 @@ jobs:
 workflows:
   semgrep:
     jobs:
-      - jdk17:
-          requires:
-            - cache-secrets
+      - jdk17
       - general-platform-helpers/job-semgrep-prepare:
           name: semgrep-prepare
       - general-platform-helpers/job-semgrep-scan:
