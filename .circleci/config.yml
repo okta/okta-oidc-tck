@@ -33,13 +33,20 @@ jobs:
         JVM_OPTS: -Xmx3200m
     steps: *build_steps
 
+  snyk-scan:
+    docker:
+      - image: cimg/openjdk:21.0.0
+    steps:
+      - checkout
+      - run: ./mvnw clean install -Pci
+      - general-platform-helpers/step-load-dependencies
+      - general-platform-helpers/step-run-snyk-monitor:
+          scan-all-projects: false
+          skip-unresolved: false
+          run-on-non-main: true
+          additional-arguments: "--maven-aggregate-project"
+
 workflows:
-  # build_and_test:
-  #   jobs:
-  #     - jdk8
-  #     - jdk11
-  #     - jdk17
-  # See OKTA-634446
   semgrep:
     jobs:
       - general-platform-helpers/job-semgrep-prepare:
@@ -48,3 +55,11 @@ workflows:
           name: "Scan with Semgrep"
           requires:
             - semgrep-prepare
+      - general-platform-helpers/job-snyk-prepare:
+          name: prepare-snyk
+          requires:
+            - jdk17
+      - snyk-scan:
+          name: execute-snyk
+          requires:
+            - prepare-snyk
