@@ -47,7 +47,7 @@
                 <groupId>io.rest-assured</groupId>
                 <artifactId>rest-assured-bom</artifactId>
                 <type>pom</type>
-                <version>5.4.0</version>
+                <version>5.5.0</version>
                 <scope>import</scope>
             </dependency>
         </dependencies>
