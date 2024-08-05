@@ -56,5 +56,7 @@ workflows:
             - static-analysis
       - snyk-scan:
           name: execute-snyk
+          context:
+            - static-analysis
           requires:
             - jdk17
