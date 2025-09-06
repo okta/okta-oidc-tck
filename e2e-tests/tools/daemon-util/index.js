@@ -17,17 +17,22 @@ const waitOn = require('wait-on');
 const chalk = require('chalk');
 const find = require('find-process');
 const platform = require('platform');
-const { execSync } = require('child_process');
+const { execSync, spawn } = require('child_process');
 
 const daemonUtil = module.exports;
 
 function startNpmScript(script, color, env, waitForMessage) {
-  const command = env ? `${env} npm run` : 'npm run'
-  const child = new Monitor(script, {
-    command,
-    max: 1,
-    silent: true,
-    spawnWith: {shell: true}
+  // const command = env ? `${env} npm run` : 'npm run'
+  // const child = new Monitor(script, {
+  //   command,
+  //   max: 1,
+  //   silent: true,
+  //   spawnWith: {shell: true}
+  // });
+
+  const child = spawn('npm', ['run', script], {
+    shell: true,
+    env: {...env}
   });
 
   const normal = chalk[color || 'yellow'];
@@ -136,7 +141,8 @@ daemonUtil.startOktaHostedLoginServer = () => startAndWait({
   resources: [
     `tcp:8080`,
   ],
-  env: 'BROWSER=none',
+  // env: 'BROWSER=none',
+  env: {'BROWSER': 'none'},
   waitForMessage: process.env.WAIT_FOR_MESSAGE
 });
 
@@ -146,7 +152,8 @@ daemonUtil.startCustomLoginServer = () => startAndWait({
   resources: [
     `tcp:8080`,
   ],
-  env: 'BROWSER=none',
+  // env: 'BROWSER=none',
+  env: {'BROWSER': 'none'},
   waitForMessage: process.env.WAIT_FOR_MESSAGE
 });
 
