@@ -2,7 +2,7 @@
   "name": "@okta/okta-oidc-tck.e2s-tests",
   "private": "true",
   "dependencies": {
-    "pm2": "^5.3.1"
+    "pm2": "^5.4.3"
   },
   "resolutions": {
     "axios": "^1.6.3",
